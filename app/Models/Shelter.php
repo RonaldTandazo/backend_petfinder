@@ -8,35 +8,41 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Authenticatable
+class Shelter extends Authenticatable
 {
     use Notifiable;
 
-    protected $table = 'users';
+    protected $table = 'shelters';
 
     protected $fillable = [
-        'first_names',
-        'last_names',
-        'username',
+        'name',
+        'business_name',
+        'tax_identification',
         'email',
         'password',
         'telephone',
+        'physical_address',
         'country_id',
-        'gender_id',
         'city',
-        'address',
-        'avatar',
+        'latitude',
+        'longitude',
+        'web_page',
+        'business_hours',
+        'logo',
+        'verified',
     ];
 
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     protected function casts(): array
     {
         return [
             'password' => 'hashed',
+            'verified' => 'boolean',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
         ];
     }
 
@@ -45,23 +51,13 @@ class User extends Authenticatable
         return $this->belongsTo(Country::class);
     }
 
-    public function gender(): BelongsTo
-    {
-        return $this->belongsTo(Gender::class);
-    }
-
     public function tutor(): HasOne
     {
         return $this->hasOne(Tutor::class);
     }
 
-    public function adoptions(): HasMany
+    public function news(): HasMany
     {
-        return $this->hasMany(Adoption::class);
-    }
-
-    public function lostPetEvents(): HasMany
-    {
-        return $this->hasMany(LostPetEvent::class);
+        return $this->hasMany(ShelterNews::class);
     }
 }
