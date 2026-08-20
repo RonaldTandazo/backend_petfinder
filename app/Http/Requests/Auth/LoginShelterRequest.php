@@ -22,9 +22,9 @@ class LoginShelterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required'    => 'El correo electrónico es obligatorio.',
-            'email.email'       => 'Debe ingresar un correo electrónico válido.',
-            'password.required' => 'La contraseña es obligatoria.',
+            'email.required'    => 'El correo electrónico es obligatorio',
+            'email.email'       => 'Debe ingresar un correo electrónico válido',
+            'password.required' => 'La contraseña es obligatoria',
         ];
     }
 }

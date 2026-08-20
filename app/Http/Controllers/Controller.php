@@ -55,7 +55,7 @@ abstract class Controller
      */
     protected function sendResponse(
         mixed $data = null,
-        string $message = 'Operación realizada con éxito.',
+        string $message = 'Operación realizada con éxito',
         int $code = Response::HTTP_OK
     ): JsonResponse {
         return response()->json([
@@ -70,7 +70,7 @@ abstract class Controller
      * Respuesta de error estandarizada.
      */
     protected function sendError(
-        string $message = 'Ha ocurrido un error inesperado.',
+        string $message = 'Ha ocurrido un error inesperado',
         mixed $error = null,
         int $code = Response::HTTP_INTERNAL_SERVER_ERROR
     ): JsonResponse {

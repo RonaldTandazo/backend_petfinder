@@ -22,8 +22,8 @@ class LoginUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'login.required'    => 'El correo o nombre de usuario es obligatorio.',
-            'password.required' => 'La contraseña es obligatoria.',
+            'login.required'    => 'El correo o nombre de usuario es obligatorio',
+            'password.required' => 'La contraseña es obligatoria',
         ];
     }
 }

@@ -35,11 +35,11 @@ class RegisterShelterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.unique'       => 'El correo electrónico ya se encuentra registrado.',
-            'country_id.exists'  => 'El país seleccionado no es válido.',
-            'web_page.url'       => 'El formato de la página web debe ser una URL válida.',
-            'latitude.between'   => 'La latitud debe estar dentro de un rango geográfico válido.',
-            'longitude.between'  => 'La longitud debe estar dentro de un rango geográfico válido.',
+            'email.unique'       => 'El correo electrónico ya se encuentra registrado',
+            'country_id.exists'  => 'El país seleccionado no es válido',
+            'web_page.url'       => 'El formato de la página web debe ser una URL válida',
+            'latitude.between'   => 'La latitud debe estar dentro de un rango geográfico válido',
+            'longitude.between'  => 'La longitud debe estar dentro de un rango geográfico válido',
         ];
     }
 }

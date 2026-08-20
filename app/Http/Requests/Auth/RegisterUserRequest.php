@@ -32,10 +32,10 @@ class RegisterUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'username.unique'   => 'El nombre de usuario ya está registrado.',
-            'email.unique'      => 'El correo electrónico ya se encuentra registrado.',
-            'country_id.exists' => 'El país seleccionado no es válido.',
-            'gender_id.exists'  => 'El género seleccionado no es válido.',
+            'username.unique'   => 'El nombre de usuario ya está registrado',
+            'email.unique'      => 'El correo electrónico ya se encuentra registrado',
+            'country_id.exists' => 'El país seleccionado no es válido',
+            'gender_id.exists'  => 'El género seleccionado no es válido',
         ];
     }
 }

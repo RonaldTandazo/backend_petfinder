@@ -55,7 +55,7 @@ class AuthController extends Controller
             ]);
 
             return $this->sendError(
-                message: 'No se pudo completar el registro del usuario.',
+                message: 'No se pudo completar el registro del usuario',
                 error: $th->getMessage(),
                 code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
@@ -98,7 +98,7 @@ class AuthController extends Controller
             ]);
 
             return $this->sendError(
-                message: 'No se pudo completar el registro del refugio.',
+                message: 'No se pudo completar el registro del refugio',
                 error: $th->getMessage(),
                 code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
@@ -116,7 +116,7 @@ class AuthController extends Controller
 
             if (! $user || ! Hash::check($credentials['password'], $user->password)) {
                 return $this->sendError(
-                    message: 'Las credenciales ingresadas son incorrectas.',
+                    message: 'Las credenciales ingresadas son incorrectas',
                     code: Response::HTTP_UNAUTHORIZED
                 );
             }
@@ -133,13 +133,13 @@ class AuthController extends Controller
                     'access_token' => $token,
                     'token_type'   => 'Bearer',
                 ],
-                message: 'Inicio de sesión exitoso.'
+                message: 'Inicio de sesión exitoso'
             );
         } catch (Throwable $th) {
             Log::error('Error en loginUser: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'Error al intentar iniciar sesión.',
+                message: 'Error al intentar iniciar sesión',
                 error: $th->getMessage(),
                 code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
@@ -155,7 +155,7 @@ class AuthController extends Controller
 
             if (! $shelter || ! Hash::check($credentials['password'], $shelter->password)) {
                 return $this->sendError(
-                    message: 'Las credenciales ingresadas son incorrectas.',
+                    message: 'Las credenciales ingresadas son incorrectas',
                     code: Response::HTTP_UNAUTHORIZED
                 );
             }
@@ -172,13 +172,13 @@ class AuthController extends Controller
                     'access_token' => $token,
                     'token_type'   => 'Bearer',
                 ],
-                message: 'Inicio de sesión exitoso.'
+                message: 'Inicio de sesión exitoso'
             );
         } catch (Throwable $th) {
             Log::error('Error en loginShelter: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'Error al intentar iniciar sesión.',
+                message: 'Error al intentar iniciar sesión',
                 error: $th->getMessage(),
                 code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
@@ -191,13 +191,13 @@ class AuthController extends Controller
             $request->user()->currentAccessToken()->delete();
 
             return $this->sendResponse(
-                message: 'Sesión cerrada correctamente.'
+                message: 'Sesión cerrada correctamente'
             );
         } catch (Throwable $th) {
             Log::error('Error en logout: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'Error al cerrar sesión.',
+                message: 'Error al cerrar sesión',
                 error: $th->getMessage(),
                 code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
