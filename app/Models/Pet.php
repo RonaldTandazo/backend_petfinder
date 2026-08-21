@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Carbon\Carbon;
 
 class Pet extends Model
 {
@@ -68,5 +71,46 @@ class Pet extends Model
     public function lostPetReports(): HasMany
     {
         return $this->hasMany(LostPet::class);
+    }
+
+    public function mainPicture(): HasOne
+    {
+        return $this->hasOne(PetPicture::class)->where('is_main', true);
+    }
+
+    protected function age(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if (!$this->born_date) {
+                    return null;
+                }
+
+                $bornDate = Carbon::parse($this->born_date);
+                $diff = $bornDate->diff(Carbon::now());
+
+                $years = $diff->y;
+                $months = $diff->m;
+
+                if ($years === 0 && $months === 0) {
+                    $label = 'Recién nacido';
+                } else {
+                    $parts = [];
+                    if ($years > 0) {
+                        $parts[] = "{$years} " . ($years === 1 ? 'año' : 'años');
+                    }
+                    if ($months > 0) {
+                        $parts[] = "{$months} " . ($months === 1 ? 'mes' : 'meses');
+                    }
+                    $label = implode(' y ', $parts);
+                }
+
+                return [
+                    'years'  => $years,
+                    'months' => $months,
+                    'label'  => $label,
+                ];
+            }
+        );
     }
 }

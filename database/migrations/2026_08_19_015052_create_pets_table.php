@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
-            $table->string('name')->nullable();
+            $table->string('name');
             $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
             $table->string('race')->nullable();
             $table->string('color')->nullable();
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
             $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->text('description')->nullable();
-            $table->foreignId('pet_status_id')->constrained('pet_statuses')->cascadeOnDelete();
+            $table->foreignId('pet_status_id')->default(1)->constrained('pet_statuses')->cascadeOnDelete();
             $table->timestamps();
         });
     }

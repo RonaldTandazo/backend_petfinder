@@ -36,16 +36,9 @@ class AuthController extends Controller
                     'user_id' => $user->id,
                     'shelter_id' => null,
                 ]);
-
-                $user->load(['country', 'gender', 'tutor']);
-
-                return [
-                    'user' => new UserResource($user)
-                ];
             });
 
             return $this->sendResponse(
-                data: $result,
                 message: 'Usuario registrado exitosamente',
                 code: Response::HTTP_CREATED
             );
@@ -66,9 +59,12 @@ class AuthController extends Controller
     {
         try {
             $result = DB::transaction(function () use ($request) {
-                $shelterData = array_merge($request->validated(), [
-                    'verified' => false,
-                ]);
+                $shelterData = array_merge(
+                    $request->validated(),
+                    [
+                        'verified' => false,
+                    ]
+                );
 
                 $shelter = Shelter::create($shelterData);
 
@@ -79,12 +75,6 @@ class AuthController extends Controller
                     'user_id' => null,
                     'shelter_id' => $shelter->id,
                 ]);
-
-                $shelter->load(['country', 'tutor']);
-
-                return [
-                    'shelter' => new ShelterResource($shelter)
-                ];
             });
 
             return $this->sendResponse(
