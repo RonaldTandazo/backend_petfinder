@@ -9,10 +9,7 @@ Route::prefix('auth')->group(function () {
         Route::post('shelter', [AuthController::class, 'registerShelter']);
     });
 
-    Route::prefix('login')->group(function () {
-        Route::post('user', [AuthController::class, 'loginUser']);
-        Route::post('shelter', [AuthController::class, 'loginShelter']);
-    });
+    Route::post('login', [AuthController::class, 'login']);
 
     Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 });

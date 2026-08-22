@@ -45,7 +45,6 @@ class PetController extends Controller
             return $this->sendResponse(
                 data: $data,
                 message: 'Listado de mascotas obtenido exitosamente',
-                code: Response::HTTP_OK
             );
         } catch (Throwable $th) {
             Log::error('Error al obtener lista de mascotas: ' . $th->getMessage(), [
@@ -55,7 +54,6 @@ class PetController extends Controller
             return $this->sendError(
                 message: 'No se pudo obtener el listado de mascotas',
                 error: $th->getMessage(),
-                code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -72,8 +70,7 @@ class PetController extends Controller
 
             return $this->sendResponse(
                 data: $pet,
-                message: 'Información de la mascota obtenida exitosamente',
-                code: Response::HTTP_OK
+                message: 'Información de la mascota obtenida exitosamente'
             );
         } catch (ModelNotFoundException $e) {
             return $this->sendError(
@@ -87,8 +84,7 @@ class PetController extends Controller
 
             return $this->sendError(
                 message: 'No se pudo obtener el detalle de la mascota',
-                error: $th->getMessage(),
-                code: Response::HTTP_INTERNAL_SERVER_ERROR
+                error: $th->getMessage()
             );
         }
     }
@@ -131,8 +127,7 @@ class PetController extends Controller
 
             return $this->sendError(
                 message: 'No se pudo completar el registro del mascota',
-                error: $th->getMessage(),
-                code: Response::HTTP_INTERNAL_SERVER_ERROR
+                error: $th->getMessage()
             );
         }
     }
@@ -174,8 +169,7 @@ class PetController extends Controller
 
             return $this->sendResponse(
                 data: $result,
-                message: 'Mascota actualizada exitosamente',
-                code: Response::HTTP_OK
+                message: 'Mascota actualizada exitosamente'
             );
         } catch (ModelNotFoundException $e) {
             return $this->sendError(
@@ -189,8 +183,7 @@ class PetController extends Controller
 
             return $this->sendError(
                 message: 'No se pudo actualizar mascota',
-                error: $th->getMessage(),
-                code: Response::HTTP_INTERNAL_SERVER_ERROR
+                error: $th->getMessage()
             );
         }
     }
@@ -211,8 +204,7 @@ class PetController extends Controller
             });
 
             return $this->sendResponse(
-                message: 'Mascota eliminada exitosamente',
-                code: Response::HTTP_OK
+                message: 'Mascota eliminada exitosamente'
             );
         } catch (ModelNotFoundException $e) {
             return $this->sendError(
@@ -226,8 +218,7 @@ class PetController extends Controller
 
             return $this->sendError(
                 message: 'No se pudo eliminar mascota',
-                error: $th->getMessage(),
-                code: Response::HTTP_INTERNAL_SERVER_ERROR
+                error: $th->getMessage()
             );
         }
     }

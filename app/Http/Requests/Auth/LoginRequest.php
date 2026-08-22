@@ -4,7 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginUserRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,15 +14,17 @@ class LoginUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login'    => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'email'        => ['required', 'string', 'email'],
+            'password'     => ['required', 'string'],
+            'account_type' => ['nullable', 'string', 'max:10'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'login.required'    => 'El correo o nombre de usuario es obligatorio',
+            'email.required'    => 'El correo electrónico es obligatorio',
+            'email.email'       => 'Debe ingresar un correo electrónico válido',
             'password.required' => 'La contraseña es obligatoria',
         ];
     }
