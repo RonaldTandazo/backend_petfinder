@@ -90,5 +90,12 @@ class CatalogSeeder extends Seeder
             ['id' => 2, 'name' => 'Evento de Adopción', 'tag' => 'EVENT', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 3, 'name' => 'Campaña / Donación', 'tag' => 'CAMPAIGN', 'created_at' => $now, 'updated_at' => $now],
         ]);
+
+        // Health Condition
+        DB::table('health_conditions')->insertOrIgnore([
+            ['id' => 1, 'name' => 'Vacunado', 'tag' => 'VACCINATED', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 2, 'name' => 'Desparasitado', 'tag' => 'DEWORMED', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 3, 'name' => 'Esterilizado / Castrado', 'tag' => 'NEUTERED', 'created_at' => $now, 'updated_at' => $now],
+        ]);
     }
 }

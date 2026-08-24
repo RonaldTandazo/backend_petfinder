@@ -47,9 +47,7 @@ class PetController extends Controller
                 message: 'Listado de mascotas obtenido exitosamente',
             );
         } catch (Throwable $th) {
-            Log::error('Error al obtener lista de mascotas: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error al obtener lista de mascotas: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo obtener el listado de mascotas',
@@ -78,9 +76,7 @@ class PetController extends Controller
                 code: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $th) {
-            Log::error('Error al obtener detalle de la mascota: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error al obtener detalle de la mascota: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo obtener el detalle de la mascota',
@@ -94,15 +90,29 @@ class PetController extends Controller
         try {
             $result = DB::transaction(function () use ($request) {
                 $validated = $request->validated();
-                $petData = array_diff_key($validated, ['photos' => '']);
+
+                $petData = collect($validated)->except(['photos', 'health_conditions'])->toArray();
                 $petData['tutor_id'] = $this->getTutorId();
 
                 $pet = Pet::create($petData);
 
-                if (!empty($validated['photos'])) {
-                    $photosToInsert = collect($validated['photos'])->map(function ($photo) {
+                $photos = $validated['photos'] ?? [];
+                $healthConditions = $validated['health_conditions'] ?? [];
+
+                if (!empty($healthConditions)) {
+                    $healthConditions = collect($healthConditions)->map(function ($healthCondition) {
                         return [
-                            'picture'     => $photo['path'],
+                            'health_condition_id' => $healthCondition
+                        ];
+                    })->toArray();
+
+                    $pet->healthConditions()->createMany($healthConditions);
+                }
+
+                if (!empty($photos)) {
+                    $photosToInsert = collect($photos)->map(function ($photo) {
+                        return [
+                            'picture' => $photo['path'],
                             'is_main' => filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN),
                         ];
                     })->toArray();
@@ -121,9 +131,7 @@ class PetController extends Controller
                 code: Response::HTTP_CREATED
             );
         } catch (Throwable $th) {
-            Log::error('Error registrando mascota: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error registrando mascota: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo completar el registro del mascota',
@@ -177,9 +185,7 @@ class PetController extends Controller
                 code: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $th) {
-            Log::error('Error actualizando mascota: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error actualizando mascota: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo actualizar mascota',
@@ -212,9 +218,7 @@ class PetController extends Controller
                 code: Response::HTTP_NOT_FOUND
             );
         } catch (Throwable $th) {
-            Log::error('Error eliminando mascota: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error eliminando mascota: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo eliminar mascota',

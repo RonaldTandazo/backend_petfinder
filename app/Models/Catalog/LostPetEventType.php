@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catalog;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +10,8 @@ class LostPetEventType extends Model
     protected $table = 'lost_pet_event_types';
 
     protected $fillable = ['name', 'tag'];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function events(): HasMany
     {

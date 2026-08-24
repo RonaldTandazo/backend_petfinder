@@ -15,16 +15,18 @@ class FormPetRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'             => ['required', 'string', 'max:100'],
-            'species_id'       => ['required', 'integer', 'exists:species,id'],
-            'race'             => ['nullable', 'string', 'max:50'],
-            'color'            => ['nullable', 'string', 'max:50'],
-            'born_date'        => ['nullable', 'date', 'before_or_equal:today'],
-            'animal_gender_id' => ['required', 'integer', 'exists:animal_genders,id'],
-            'size_id'          => ['required', 'integer', 'exists:sizes,id'],
-            'description'      => ['nullable', 'string', 'max:500'],
-            'pet_status_id'    => ['nullable', 'integer', 'exists:pet_statuses,id'],
-            'photos'           => [
+            'name'                => ['required', 'string', 'max:100'],
+            'species_id'          => ['required', 'integer', 'exists:species,id'],
+            'race'                => ['nullable', 'string', 'max:50'],
+            'color'               => ['nullable', 'string', 'max:50'],
+            'born_date'           => ['required', 'date', 'before_or_equal:today'],
+            'animal_gender_id'    => ['required', 'integer', 'exists:animal_genders,id'],
+            'size_id'             => ['required', 'integer', 'exists:sizes,id'],
+            'description'         => ['nullable', 'string', 'max:500'],
+            'pet_status_id'       => ['nullable', 'integer', 'exists:pet_statuses,id'],
+            'health_conditions'   => ['nullable', 'array'],
+            'health_conditions.*' => ['integer', 'exists:health_conditions,id'],
+            'photos'              => [
                 'nullable',
                 'array',
                 'max:5',
@@ -42,8 +44,8 @@ class FormPetRequest extends FormRequest
                     }
                 },
             ],
-            'photos.*.path'    => ['required', 'string', 'max:255'],
-            'photos.*.is_main' => ['required', 'boolean'],
+            'photos.*.path'       => ['required', 'string', 'max:255'],
+            'photos.*.is_main'    => ['required', 'boolean'],
         ];
     }
 
@@ -57,21 +59,25 @@ class FormPetRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'             => 'El nombre de la mascota es obligatorio',
-            'species_id.required'       => 'Debe seleccionar una especie',
-            'species_id.exists'         => 'La especie seleccionada no es válida',
-            'animal_gender_id.required' => 'Debe seleccionar un género',
-            'animal_gender_id.exists'   => 'El género seleccionado no es válido',
-            'size_id.required'          => 'Debe seleccionar un tamaño',
-            'size_id.exists'            => 'El tamaño seleccionado no es válido',
-            'pet_status_id.exists'      => 'El estado de adopción seleccionado no es válido',
-            'born_date.before_or_equal' => 'La fecha de nacimiento no puede ser futura',
-            'photos.array'              => 'El formato de las fotos es inválido',
-            'photos.max'                => 'No puede adjuntar más de 5 fotos',
-            'photos.*.path.required'    => 'La ruta de la imagen es obligatoria',
-            'photos.*.path.string'      => 'La ruta de la imagen debe ser una cadena válida',
-            'photos.*.is_main.required' => 'Debe indicar cuál foto es la principal',
-            'photos.*.is_main.boolean'  => 'El campo principal debe ser verdadero o falso',
+            'name.required'               => 'El nombre de la mascota es obligatorio',
+            'species_id.required'         => 'Debe seleccionar una especie',
+            'species_id.exists'           => 'La especie seleccionada no es válida',
+            'animal_gender_id.required'   => 'Debe seleccionar un género',
+            'animal_gender_id.exists'     => 'El género seleccionado no es válido',
+            'size_id.required'            => 'Debe seleccionar un tamaño',
+            'size_id.exists'              => 'El tamaño seleccionado no es válido',
+            'pet_status_id.exists'        => 'El estado de adopción seleccionado no es válido',
+            'born_date.required'          => 'La fecha de nacimiento es requerida',
+            'born_date.before_or_equal'   => 'La fecha de nacimiento no puede ser futura',
+            'health_conditions.array'     => 'El formato de las condiciones de salud debe ser una lista',
+            'health_conditions.*.integer' => 'Cada condición de salud debe ser un identificador válido',
+            'health_conditions.*.exists'  => 'Una o más condiciones de salud seleccionadas no existen',
+            'photos.array'                => 'El formato de las fotos es inválido',
+            'photos.max'                  => 'No puede adjuntar más de 5 fotos',
+            'photos.*.path.required'      => 'La ruta de la imagen es obligatoria',
+            'photos.*.path.string'        => 'La ruta de la imagen debe ser una cadena válida',
+            'photos.*.is_main.required'   => 'Debe indicar cuál foto es la principal',
+            'photos.*.is_main.boolean'    => 'El campo principal debe ser verdadero o falso',
         ];
     }
 }

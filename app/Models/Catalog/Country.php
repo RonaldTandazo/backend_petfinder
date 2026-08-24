@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catalog;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +10,8 @@ class Country extends Model
     protected $table = 'countries';
 
     protected $fillable = ['name', 'abbreviation'];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function users(): HasMany
     {

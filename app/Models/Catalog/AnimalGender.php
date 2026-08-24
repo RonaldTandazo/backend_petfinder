@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catalog;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Size extends Model
+class AnimalGender extends Model
 {
-    protected $table = 'sizes';
+    protected $table = 'animal_genders';
 
     protected $fillable = ['name', 'tag'];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function pets(): HasMany
     {

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
             $table->string('race')->nullable();
             $table->string('color')->nullable();
-            $table->date('born_date')->nullable();
+            $table->date('born_date');
             $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
             $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->text('description')->nullable();

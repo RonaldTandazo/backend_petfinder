@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Catalog\AnimalGender;
+use App\Models\Catalog\PetStatus;
+use App\Models\Catalog\Size;
+use App\Models\Catalog\Species;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Carbon\Carbon;
 
 class Pet extends Model
 {
@@ -56,6 +60,11 @@ class Pet extends Model
     public function petStatus(): BelongsTo
     {
         return $this->belongsTo(PetStatus::class, 'pet_status_id');
+    }
+
+    public function healthConditions(): HasMany
+    {
+        return $this->hasMany(PetHealthCondition::class);
     }
 
     public function pictures(): HasMany

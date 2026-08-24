@@ -45,9 +45,7 @@ class AuthController extends Controller
                 code: Response::HTTP_CREATED
             );
         } catch (Throwable $th) {
-            Log::error('Error registrando usuario: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error registrando usuario: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo completar el registro del usuario',
@@ -84,9 +82,7 @@ class AuthController extends Controller
                 code: Response::HTTP_CREATED
             );
         } catch (Throwable $th) {
-            Log::error('Error registrando refugio: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
+            Log::error('Error registrando refugio: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
                 message: 'No se pudo completar el registro del refugio',
@@ -164,6 +160,38 @@ class AuthController extends Controller
             return $this->sendError(
                 message: 'Error al intentar iniciar sesión',
                 error: $th->getMessage()
+            );
+        }
+    }
+
+    public function me(Request $request): JsonResponse
+    {
+        try {
+            $account = $request->user();
+
+            if (!$account) {
+                return $this->sendError(
+                    message: 'Token no válido o usuario no encontrado',
+                    code: Response::HTTP_UNAUTHORIZED
+                );
+            }
+
+            $type = $this->isUser() ? 'user' : 'shelter';
+
+            return $this->sendResponse(
+                data: [
+                    'type' => $type,
+                    'account' => $account,
+                ],
+                message: 'Sesión verificada exitosamente'
+            );
+        } catch (Throwable $th) {
+            Log::error('Error validando token: ' . $th->getMessage(), ['exception' => $th]);
+
+            return $this->sendError(
+                message: 'Error al verificar la sesión',
+                error: $th->getMessage(),
+                code: Response::HTTP_UNAUTHORIZED
             );
         }
     }
