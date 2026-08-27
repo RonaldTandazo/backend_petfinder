@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Adoption;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Adoption\AdoptionPetsRequest;
 use App\Http\Resources\Adoption\AdoptionPetResource;
 use App\Models\Pet;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class AdoptionController extends Controller
 {
-    public function getAdoptionPets(Request $request): JsonResponse
+    public function getAdoptionPets(AdoptionPetsRequest $request): JsonResponse
     {
         try {
-            $page = max(1, $request->integer('page', 1));
-            $limit = min(50, max(1, $request->integer('limit', 20)));
+            $page = $request->integer('page', 1);
+            $limit = $request->integer('limit', 20);
             $skip = ($page - 1) * $limit;
 
             $pets = Pet::where('pet_status_id', 1)
@@ -34,8 +34,6 @@ class AdoptionController extends Controller
                 'hasMore' => $hasMore,
                 'pets'    => $petList,
             ];
-
-            Log::alert($data);
 
             return $this->sendResponse(
                 data: $data,
