@@ -15,7 +15,7 @@ class PetDetailResource extends JsonResource
             'species'   => $this->whenLoaded('species', fn () => $this->species->name),
             'gender'    => $this->whenLoaded('animalGender', fn () => $this->animalGender->name),
             'size'      => $this->whenLoaded('size', fn () => $this->size->name),
-            'picture'   => $this->whenLoaded('mainPicture', fn () => $this->mainPicture?->picture),
+            'picture'   => $this->whenLoaded('mainPicture', fn () => $this->mainPicture?->path ?? $this->mainPicture?->path_temp),
             'born_date' => $this->born_date,
             'age'       => $this->age,
         ];

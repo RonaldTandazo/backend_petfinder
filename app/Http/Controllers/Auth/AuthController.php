@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Helpers\Auth\AuthHelper;
+use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\RegisterShelterRequest;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Tutor;
-use App\Models\TutorType;
-use App\Models\User;
-use App\Models\Shelter;
+use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -22,34 +17,30 @@ use Throwable;
 class AuthController extends Controller
 {
     public function __construct(
-        protected AuthHelper $authHelper
+        protected AuthService $authService
     ) {}
 
     public function registerUser(RegisterUserRequest $request): JsonResponse
     {
         try {
-            $result = DB::transaction(function () use ($request) {
-                $user = User::create($request->validated());
-
-                $userTutorType = TutorType::where('tag', 'USER')->first();
-
-                Tutor::create([
-                    'tutor_type_id' => $userTutorType?->id ?? 1,
-                    'user_id' => $user->id,
-                    'shelter_id' => null,
-                ]);
-            });
+            $this->authService->registerUser($request->validated());
 
             return $this->sendResponse(
-                message: 'Usuario registrado exitosamente',
-                code: Response::HTTP_CREATED
+                message : 'Usuario registrado exitosamente',
+                code    : Response::HTTP_CREATED
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
             );
         } catch (Throwable $th) {
             Log::error('Error registrando usuario: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'No se pudo completar el registro del usuario',
-                error: $th->getMessage()
+                message : 'No se pudo completar el registro del usuario',
+                error   : $th->getMessage()
             );
         }
     }
@@ -57,36 +48,25 @@ class AuthController extends Controller
     public function registerShelter(RegisterShelterRequest $request): JsonResponse
     {
         try {
-            $result = DB::transaction(function () use ($request) {
-                $shelterData = array_merge(
-                    $request->validated(),
-                    [
-                        'verified' => false,
-                    ]
-                );
-
-                $shelter = Shelter::create($shelterData);
-
-                $shelterTutorType = TutorType::where('tag', 'SHELTER')->first();
-
-                Tutor::create([
-                    'tutor_type_id' => $shelterTutorType?->id ?? 2,
-                    'user_id' => null,
-                    'shelter_id' => $shelter->id,
-                ]);
-            });
+            $shelter = $this->authService->registerShelter($request->validated());
 
             return $this->sendResponse(
-                data: $result,
-                message: 'Refugio registrado exitosamente',
-                code: Response::HTTP_CREATED
+                data    : ['shelter_id' => $shelter->id],
+                message : 'Refugio registrado exitosamente',
+                code    : Response::HTTP_CREATED
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
             );
         } catch (Throwable $th) {
             Log::error('Error registrando refugio: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'No se pudo completar el registro del refugio',
-                error: $th->getMessage()
+                message : 'No se pudo completar el registro del refugio',
+                error   : $th->getMessage()
             );
         }
     }
@@ -94,72 +74,34 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $credentials = $request->validated();
+            $result = $this->authService->login($request->validated());
 
-            $email = $credentials['email'];
-            $password = $credentials['password'];
-            $selectedType = $credentials['account_type'] ?? null;
-
-            $accounts = $this->authHelper->findAccountsByEmail($email);
-            $user = $accounts['user'];
-            $shelter = $accounts['shelter'];
-
-            if (!$user && !$shelter) {
-                return $this->sendError(
-                    message: 'Las credenciales ingresadas son incorrectas',
-                    code: Response::HTTP_UNAUTHORIZED
-                );
-            }
-
-            if ($selectedType) {
-                $targetAccount = $selectedType === 'user' ? $user : $shelter;
-
-                if (!$targetAccount || !Hash::check($password, $targetAccount->password)) {
-                    return $this->sendError(
-                        message: 'Las credenciales ingresadas son incorrectas',
-                        code: Response::HTTP_UNAUTHORIZED
-                    );
-                }
-
-                return $this->sendResponse(
-                    data: $this->authHelper->generateAuthPayload($targetAccount, $selectedType),
-                    message: 'Inicio de sesión exitoso'
-                );
-            }
-
-            $userValid = $user && Hash::check($password, $user->password);
-            $shelterValid = $shelter && Hash::check($password, $shelter->password);
-
-            if (!$userValid && !$shelterValid) {
-                return $this->sendError(
-                    message: 'Las credenciales ingresadas son incorrectas',
-                    code: Response::HTTP_UNAUTHORIZED
-                );
-            }
-
-            if ($userValid && $shelterValid) {
-                return $this->sendResponse(
-                    data: [
-                        'requires_account_selection' => true,
-                        'available_accounts' => ['user', 'shelter'],
-                    ],
-                    message: 'Seleccione con qué tipo de cuenta desea ingresar'
-                );
-            }
-
-            $activeAccount = $userValid ? $user : $shelter;
-            $type = $userValid ? 'user' : 'shelter';
-
-            return $this->sendResponse(
-                data: $this->authHelper->generateAuthPayload($activeAccount, $type),
-                message: 'Inicio de sesión exitoso'
+            return match ($result['status']) {
+                'invalid_credentials' => $this->sendError(
+                    message : 'Las credenciales ingresadas son incorrectas',
+                    code    : Response::HTTP_UNAUTHORIZED
+                ),
+                'select_account' => $this->sendResponse(
+                    data    : $result['payload'],
+                    message : 'Seleccione con qué tipo de cuenta desea ingresar'
+                ),
+                'success' => $this->sendResponse(
+                    data    : $result['payload'],
+                    message : 'Inicio de sesión exitoso'
+                ),
+            };
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
             );
         } catch (Throwable $th) {
             Log::error('Error en login: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'Error al intentar iniciar sesión',
-                error: $th->getMessage()
+                message : 'Error al intentar iniciar sesión',
+                error   : $th->getMessage()
             );
         }
     }
@@ -171,27 +113,28 @@ class AuthController extends Controller
 
             if (!$account) {
                 return $this->sendError(
-                    message: 'Token no válido o usuario no encontrado',
-                    code: Response::HTTP_UNAUTHORIZED
+                    message : 'Token no válido o usuario no encontrado',
+                    code    : Response::HTTP_UNAUTHORIZED
                 );
             }
 
-            $type = $this->isUser() ? 'user' : 'shelter';
-
             return $this->sendResponse(
-                data: [
-                    'type' => $type,
-                    'account' => $account,
-                ],
-                message: 'Sesión verificada exitosamente'
+                data    : $this->authService->sessionInfo($account, $this->isUser()),
+                message : 'Sesión verificada exitosamente'
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
             );
         } catch (Throwable $th) {
             Log::error('Error validando token: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'Error al verificar la sesión',
-                error: $th->getMessage(),
-                code: Response::HTTP_UNAUTHORIZED
+                message : 'Error al verificar la sesión',
+                error   : $th->getMessage(),
+                code    : Response::HTTP_UNAUTHORIZED
             );
         }
     }
@@ -199,17 +142,23 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         try {
-            $request->user()->currentAccessToken()->delete();
+            $this->authService->logout($request->user());
 
             return $this->sendResponse(
                 message: 'Sesión cerrada correctamente'
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
             );
         } catch (Throwable $th) {
             Log::error('Error en logout: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message: 'Error al cerrar sesión',
-                error: $th->getMessage()
+                message : 'Error al cerrar sesión',
+                error   : $th->getMessage()
             );
         }
     }

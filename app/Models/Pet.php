@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Pet extends Model
 {
@@ -67,9 +68,9 @@ class Pet extends Model
         return $this->hasMany(PetHealthCondition::class);
     }
 
-    public function pictures(): HasMany
+    public function pictures(): MorphMany
     {
-        return $this->hasMany(PetPicture::class);
+        return $this->morphMany(Picture::class, 'pictureable');
     }
 
     public function adoptions(): HasMany
@@ -82,9 +83,9 @@ class Pet extends Model
         return $this->hasMany(LostPet::class);
     }
 
-    public function mainPicture(): HasOne
+    public function mainPicture(): MorphOne
     {
-        return $this->hasOne(PetPicture::class)->where('is_main', true);
+        return $this->morphOne(Picture::class, 'pictureable')->where('is_main', true);
     }
 
     protected function age(): Attribute
