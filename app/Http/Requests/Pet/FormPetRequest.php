@@ -44,7 +44,7 @@ class FormPetRequest extends FormRequest
                     }
                 },
             ],
-            'photos.*.path'       => ['required', 'string', 'max:255'],
+            'photos.*.path_temp'  => ['required', 'string', 'max:255'],
             'photos.*.is_main'    => ['required', 'boolean'],
         ];
     }
@@ -74,8 +74,8 @@ class FormPetRequest extends FormRequest
             'health_conditions.*.exists'  => 'Una o más condiciones de salud seleccionadas no existen',
             'photos.array'                => 'El formato de las fotos es inválido',
             'photos.max'                  => 'No puede adjuntar más de 5 fotos',
-            'photos.*.path.required'      => 'La ruta de la imagen es obligatoria',
-            'photos.*.path.string'        => 'La ruta de la imagen debe ser una cadena válida',
+            'photos.*.path_temp.required' => 'El archivo temporal de la imagen es obligatorio',
+            'photos.*.path_temp.string'   => 'El archivo temporal de la imagen debe ser una cadena válida',
             'photos.*.is_main.required'   => 'Debe indicar cuál foto es la principal',
             'photos.*.is_main.boolean'    => 'El campo principal debe ser verdadero o falso',
         ];

@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'minio' => [
+        'webhook_token' => env('MINIO_WEBHOOK_TOKEN'),
+    ],
+
 ];

@@ -8,6 +8,7 @@ use App\Models\Catalog\Species;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class LostPet extends Model
 {
@@ -34,10 +35,10 @@ class LostPet extends Model
     protected function casts(): array
     {
         return [
-            'event_date' => 'datetime',
+            'event_date'   => 'datetime',
             'closing_date' => 'datetime',
-            'latitude' => 'decimal:8',
-            'longitude' => 'decimal:8',
+            'latitude'     => 'decimal:8',
+            'longitude'    => 'decimal:8',
         ];
     }
 
@@ -66,9 +67,9 @@ class LostPet extends Model
         return $this->belongsTo(ReportStatus::class);
     }
 
-    public function pictures(): HasMany
+    public function pictures(): MorphMany
     {
-        return $this->hasMany(LostPetPicture::class);
+        return $this->morphMany(Picture::class, 'pictureable');
     }
 
     public function events(): HasMany

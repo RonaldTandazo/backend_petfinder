@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Catalog\LostPetEventType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class LostPetEvent extends Model
 {
@@ -26,8 +26,8 @@ class LostPetEvent extends Model
     {
         return [
             'event_date' => 'datetime',
-            'latitude' => 'decimal:8',
-            'longitude' => 'decimal:8',
+            'latitude'   => 'decimal:8',
+            'longitude'  => 'decimal:8',
         ];
     }
 
@@ -46,8 +46,8 @@ class LostPetEvent extends Model
         return $this->belongsTo(LostPetEventType::class, 'lost_pet_event_type_id');
     }
 
-    public function pictures(): HasMany
+    public function pictures(): MorphMany
     {
-        return $this->hasMany(LostPetEventPicture::class);
+        return $this->morphMany(Picture::class, 'pictureable');
     }
 }

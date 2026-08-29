@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Catalog\NewsType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class ShelterNews extends Model
 {
@@ -28,8 +28,8 @@ class ShelterNews extends Model
         return $this->belongsTo(NewsType::class);
     }
 
-    public function pictures(): HasMany
+    public function pictures(): MorphMany
     {
-        return $this->hasMany(ShelterNewsPicture::class);
+        return $this->morphMany(Picture::class, 'pictureable');
     }
 }
