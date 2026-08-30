@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Pet;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 class FormPetRequest extends FormRequest
 {
@@ -52,7 +51,8 @@ class FormPetRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'pet_status_id' => $this->input('pet_status_id', 1)
+            'pet_status_id' => $this->input('pet_status_id', 1),
+            'is_urgent' => $this->input('is_urgent', false)
         ]);
     }
 

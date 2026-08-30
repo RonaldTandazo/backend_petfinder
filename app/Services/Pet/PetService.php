@@ -41,9 +41,9 @@ class PetService
             ->firstOrFail();
     }
 
-    public function create(array $validated, int $tutorId, int $userId): Pet
+    public function create(array $validated, int $tutorId): Pet
     {
-        return DB::transaction(function () use ($validated, $tutorId, $userId) {
+        return DB::transaction(function () use ($validated, $tutorId) {
             $petData = collect($validated)->except(['photos', 'health_conditions'])->toArray();
             $petData['tutor_id'] = $tutorId;
 
@@ -63,11 +63,11 @@ class PetService
             }
 
             if (!empty($photos)) {
-                $photosToInsert = collect($photos)->map(function ($photo) use ($userId) {
+                $photosToInsert = collect($photos)->map(function ($photo) use ($tutorId) {
                     return [
                         'path_temp'      => $photo['path_temp'],
                         'is_main'        => filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN),
-                        'uploaded_by_id' => $userId,
+                        'uploaded_by_id' => $tutorId,
                     ];
                 })->toArray();
 

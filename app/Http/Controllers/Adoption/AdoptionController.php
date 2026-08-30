@@ -24,8 +24,8 @@ class AdoptionController extends Controller
             $result = $this->adoptionService->getAdoptionPets($page, $limit);
 
             $data = [
-                'hasMore' => $result['hasMore'],
                 'pets'    => AdoptionPetResource::collection($result['items']),
+                'hasMore' => $result['hasMore'],
             ];
 
             return $this->sendResponse(

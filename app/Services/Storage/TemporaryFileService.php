@@ -10,10 +10,12 @@ class TemporaryFileService
 {
     protected const DISK = 's3_temp';
 
-    public function upload(UploadedFile $file): array
+    public function upload(UploadedFile $file, ?string $uuid = null): array
     {
-        $key = Str::uuid() . '.' . $file->extension();
-
+        $uuidKey = $uuid ?? Str::uuid()->toString();
+        $extension = $file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg';
+        $key = "{$uuidKey}.{$extension}";
+        
         $file->storeAs('', $key, ['disk' => self::DISK]);
 
         return [
@@ -24,7 +26,8 @@ class TemporaryFileService
 
     public function previewUrl(string $key): string
     {
-        return Storage::disk(self::DISK)->temporaryUrl($key, now()->addMinutes(15));
+        // return Storage::disk(self::DISK)->temporaryUrl($key, now()->addMinutes(15));
+        return Storage::disk(self::DISK)->url($key);
     }
 
     public function delete(string $key): void

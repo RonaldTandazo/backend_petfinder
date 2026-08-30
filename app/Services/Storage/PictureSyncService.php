@@ -21,22 +21,32 @@ class PictureSyncService
             return;
         }
 
+        $tempDisk = Storage::disk('s3_temp');
+
         $sourceBucket = config('filesystems.disks.s3_temp.bucket');
         $targetBucket = config('filesystems.disks.s3.bucket');
-        $targetKey    = $picture->path ?? $this->buildKey($picture);
+
+        $cleanTempKey = basename(parse_url($picture->path_temp, PHP_URL_PATH));
+        $targetKey    = ltrim($picture->path ?? $this->buildKey($picture), '/');
+
+        $copySource = '/' . $sourceBucket . '/' . rawurlencode($cleanTempKey);
+
+        if (!$tempDisk->exists($cleanTempKey)) return;
 
         Storage::disk('s3')->getClient()->copyObject([
             'Bucket'            => $targetBucket,
             'Key'               => $targetKey,
-            'CopySource'        => $sourceBucket . '/' . rawurlencode($picture->path_temp),
+            'CopySource'        => $copySource,
             'MetadataDirective' => 'REPLACE',
             'Metadata'          => [
-                'id_picture'       => (string) $picture->id,
-                'id_pictureable'   => (string) $picture->pictureable_id,
+                'picture_id'       => (string) $picture->id,
+                'pictureable_id'   => (string) $picture->pictureable_id,
                 'pictureable_type' => class_basename($picture->pictureable_type),
-                'id_usuario'       => (string) ($picture->uploaded_by_id ?? ''),
+                'tutor_id'         => (string) ($picture->uploaded_by_id ?? ''),
             ],
         ]);
+
+        Storage::disk('s3_temp')->delete($cleanTempKey);
 
         $picture->update([
             'path'   => $targetKey,

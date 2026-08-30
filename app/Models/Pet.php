@@ -25,6 +25,7 @@ class Pet extends Model
         'race',
         'color',
         'born_date',
+        'is_urgent',
         'animal_gender_id',
         'size_id',
         'description',
@@ -35,6 +36,7 @@ class Pet extends Model
     {
         return [
             'born_date' => 'date',
+            'is_urgent' => 'boolean',
         ];
     }
 
