@@ -15,7 +15,6 @@ class CatalogSeeder extends Seeder
         DB::table('genders')->insertOrIgnore([
             ['id' => 1, 'name' => 'Masculino', 'tag' => 'MALE', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 2, 'name' => 'Femenino', 'tag' => 'FEMALE', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 3, 'name' => 'Otro', 'tag' => 'OTHER', 'created_at' => $now, 'updated_at' => $now],
         ]);
 
         // Countries (Usuarios / Refugios)
@@ -45,7 +44,6 @@ class CatalogSeeder extends Seeder
         DB::table('animal_genders')->insertOrIgnore([
             ['id' => 1, 'name' => 'Macho', 'tag' => 'MALE', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 2, 'name' => 'Hembra', 'tag' => 'FEMALE', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 3, 'name' => 'Desconocido', 'tag' => 'UNKNOWN', 'created_at' => $now, 'updated_at' => $now],
         ]);
 
         // Sizes

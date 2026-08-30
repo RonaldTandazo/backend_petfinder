@@ -18,11 +18,19 @@ class TemporaryFileController extends Controller
     public function store(UploadTemporaryFileRequest $request): JsonResponse
     {
         try {
-            $result = $this->temporaryFileService->upload($request->file('file'));
+            $files = $request->file('files');
+            $uuids  = $request->validated('uuids');
 
+            $results = [];
+
+            foreach ($files as $index => $file) {
+                $uuid = $uuids[$index];
+                $results[] = $this->temporaryFileService->upload($file, $uuid);
+            }
+            
             return $this->sendResponse(
-                data    : $result,
-                message : 'Archivo subido exitosamente',
+                data    : ['files' => $results],
+                message : 'Archivos subidos exitosamente',
                 code    : Response::HTTP_CREATED
             );
         } catch (CustomValidationException $e) {

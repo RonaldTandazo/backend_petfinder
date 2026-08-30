@@ -39,4 +39,9 @@ return [
         'webhook_token' => env('MINIO_WEBHOOK_TOKEN'),
     ],
 
+    'pets' => [
+        'pictures' => [
+            'host' => env('AWS_URL', 'http://localhost:9000') . '/' . env('AWS_BUCKET', 'petfinder-pictures') . '/'
+        ]
+    ]
 ];

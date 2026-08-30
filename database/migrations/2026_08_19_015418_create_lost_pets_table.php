@@ -14,19 +14,22 @@ return new class extends Migration
         Schema::create('lost_pets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
-            $table->foreignId('pet_id')->nullable()->constrained('pets')->nullOnDelete();
-            $table->foreignId('report_type_id')->constrained('report_types')->cascadeOnDelete();
-            $table->string('name');
+            $table->foreignId('report_type_id')->default(1)->constrained('report_types')->cascadeOnDelete();
             $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
+            $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
+            $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
+            $table->string('name');
             $table->string('race')->nullable();
             $table->string('color')->nullable();
             $table->text('description')->nullable();
+            $table->boolean('has_reward')->default(false);
+            $table->decimal('reward_amound', 10,2)->nullable();
             $table->string('city');
             $table->string('event_address')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamp('event_date');
-            $table->foreignId('report_status_id')->constrained('report_statuses')->cascadeOnDelete();
+            $table->foreignId('report_status_id')->default(1)->constrained('report_statuses')->cascadeOnDelete();
             $table->timestamp('closing_date')->nullable();
             $table->timestamps();
         });

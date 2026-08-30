@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Catalog\AnimalGender;
 use App\Models\Catalog\ReportStatus;
 use App\Models\Catalog\ReportType;
+use App\Models\Catalog\Size;
 use App\Models\Catalog\Species;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,12 +18,15 @@ class LostPet extends Model
 
     protected $fillable = [
         'tutor_id',
-        'pet_id',
         'report_type_id',
         'name',
         'species_id',
         'race',
         'color',
+        'animal_gender_id',
+        'size_id',
+        'has_reward',
+        'reward_amound',
         'description',
         'city',
         'event_address',
@@ -35,21 +40,18 @@ class LostPet extends Model
     protected function casts(): array
     {
         return [
-            'event_date'   => 'datetime',
-            'closing_date' => 'datetime',
-            'latitude'     => 'decimal:8',
-            'longitude'    => 'decimal:8',
+            'has_reward'    => 'boolean',
+            'reward_amound' => 'decimal:2',
+            'event_date'    => 'datetime',
+            'closing_date'  => 'datetime',
+            'latitude'      => 'decimal:8',
+            'longitude'     => 'decimal:8',
         ];
     }
 
     public function tutor(): BelongsTo
     {
         return $this->belongsTo(Tutor::class);
-    }
-
-    public function pet(): BelongsTo
-    {
-        return $this->belongsTo(Pet::class);
     }
 
     public function reportType(): BelongsTo
@@ -60,6 +62,16 @@ class LostPet extends Model
     public function species(): BelongsTo
     {
         return $this->belongsTo(Species::class);
+    }
+
+    public function animalGender(): BelongsTo
+    {
+        return $this->belongsTo(AnimalGender::class);
+    }
+
+    public function size(): BelongsTo
+    {
+        return $this->belongsTo(Size::class);
     }
 
     public function reportStatus(): BelongsTo
