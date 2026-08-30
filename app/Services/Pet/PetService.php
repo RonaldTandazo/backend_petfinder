@@ -79,9 +79,9 @@ class PetService
         });
     }
 
-    public function update(int $petId, int $tutorId, int $userId, array $validated): Pet
+    public function update(int $petId, int $tutorId, array $validated): Pet
     {
-        return DB::transaction(function () use ($petId, $tutorId, $userId, $validated) {
+        return DB::transaction(function () use ($petId, $tutorId, $validated) {
             $pet = Pet::where('id', $petId)
                 ->where('tutor_id', $tutorId)
                 ->firstOrFail();
@@ -95,11 +95,11 @@ class PetService
                 $pet->pictures()->delete();
 
                 if (!empty($validated['photos'])) {
-                    $photosToInsert = collect($validated['photos'])->map(function ($photo) use ($userId) {
+                    $photosToInsert = collect($validated['photos'])->map(function ($photo) use ($tutorId) {
                         return [
                             'path_temp'      => $photo['path_temp'],
                             'is_main'        => filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN),
-                            'uploaded_by_id' => $userId,
+                            'uploaded_by_id' => $tutorId,
                         ];
                     })->toArray();
 

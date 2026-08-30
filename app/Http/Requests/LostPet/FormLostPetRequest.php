@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Pet;
+namespace App\Http\Requests\LostPet;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FormPetRequest extends FormRequest
+class FormLostPetRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,18 +14,23 @@ class FormPetRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'                => ['required', 'string', 'max:100'],
-            'species_id'          => ['required', 'integer', 'exists:species,id'],
-            'race'                => ['nullable', 'string', 'max:50'],
-            'color'               => ['nullable', 'string', 'max:50'],
-            'born_date'           => ['required', 'date', 'before_or_equal:today'],
-            'animal_gender_id'    => ['required', 'integer', 'exists:animal_genders,id'],
-            'size_id'             => ['required', 'integer', 'exists:sizes,id'],
-            'description'         => ['nullable', 'string', 'max:500'],
-            'pet_status_id'       => ['nullable', 'integer', 'exists:pet_statuses,id'],
-            'health_conditions'   => ['nullable', 'array'],
-            'health_conditions.*' => ['integer', 'exists:health_conditions,id'],
-            'photos'              => [
+            'name'             => ['required', 'string', 'max:100'],
+            'race'             => ['nullable', 'string', 'max:50'],
+            'color'            => ['nullable', 'string', 'max:50'],
+            'description'      => ['nullable', 'string', 'max:500'],
+            'phone_home'       => ['nullable', 'string', 'max:10', 'regex:/^[0-9]{7,10}$/'],
+            'phone_mobile'     => ['nullable', 'string', 'max:15', 'regex:/^\+?[0-9]* ?[0-9]*$/'],
+            'species_id'       => ['required', 'integer', 'exists:species,id'],
+            'animal_gender_id' => ['required', 'integer', 'exists:animal_genders,id'],
+            'size_id'          => ['required', 'integer', 'exists:sizes,id'],
+            'has_reward'       => ['nullable', 'boolean'],
+            'reward_amount'    => ['nullable', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'city'             => ['nullable', 'string', 'max:50'],
+            'event_address'    => ['nullable', 'string', 'max:100'],
+            'latitude'         => ['nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,8})?$/'],
+            'longitude'        => ['nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,8})?$/'],
+            'event_date'       => ['required', 'date', 'before_or_equal:today'],
+            'photos'           => [
                 'required',
                 'array',
                 'min:1',
@@ -52,8 +57,9 @@ class FormPetRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'pet_status_id' => $this->input('pet_status_id', 1),
-            'is_urgent' => $this->boolean('is_urgent')
+            'report_type_id'   => $this->input('report_type_id', 1), 
+            'report_status_id' => $this->input('report_status_id', 1),
+            'has_reward'       => $this->boolean('has_reward')
         ]);
     }
 
@@ -67,12 +73,15 @@ class FormPetRequest extends FormRequest
             'animal_gender_id.exists'     => 'El género seleccionado no es válido',
             'size_id.required'            => 'Debe seleccionar un tamaño',
             'size_id.exists'              => 'El tamaño seleccionado no es válido',
-            'pet_status_id.exists'        => 'El estado de adopción seleccionado no es válido',
-            'born_date.required'          => 'La fecha de nacimiento es requerida',
-            'born_date.before_or_equal'   => 'La fecha de nacimiento no puede ser futura',
-            'health_conditions.array'     => 'El formato de las condiciones de salud debe ser una lista',
-            'health_conditions.*.integer' => 'Cada condición de salud debe ser un identificador válido',
-            'health_conditions.*.exists'  => 'Una o más condiciones de salud seleccionadas no existen',
+            'phone_home.max'              => 'El teléfono convencional no debe superar los 10 dígitos.',
+            'phone_home.regex'            => 'El teléfono convencional solo debe contener números (7 a 10 dígitos).',
+            'phone_mobile.max'            => 'El teléfono celular no debe superar los 15 caracteres.',
+            'phone_mobile.regex'          => 'El teléfono celular debe tener un formato válido (ej. +593 962618451 o 0962618451).',
+            'reward_amount.regex'         => 'El monto de la recompensa debe tener máximo 2 decimales',
+            'latitude.regex'              => 'La latitud debe ser un número válido con máximo 8 decimales',
+            'longitude.regex'             => 'La longitud debe ser un número válido con máximo 8 decimales',
+            'event_date.required'         => 'La fecha del suceso es requerida',
+            'event_date.before_or_equal'  => 'La fecha del suceso no puede ser futura',
             'photos.required'             => 'Las fotos son obligatorias',
             'photos.array'                => 'El formato de las fotos es inválido',
             'photos.min'                  => 'Debe adjuntar mínimo 1 foto',

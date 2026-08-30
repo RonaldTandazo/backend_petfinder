@@ -6,7 +6,6 @@ use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pet\FormPetRequest;
 use App\Http\Resources\PetListResource;
-use App\Http\Resources\PetDetailResource;
 use App\Services\Pet\PetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -89,7 +88,7 @@ class PetController extends Controller
     public function store(FormPetRequest $request): JsonResponse
     {
         try {
-            $pet = $this->petService->create($request->validated(), $this->getTutorId(), $this->getMainId());
+            $pet = $this->petService->create($request->validated(), $this->getTutorId());
 
             return $this->sendResponse(
                 data    : ['pet_id' => $pet->id],
@@ -117,7 +116,7 @@ class PetController extends Controller
         try {
             $tutorId = $this->getTutorId();
 
-            $pet = $this->petService->update($petId, $tutorId, $this->getMainId(), $request->validated());
+            $pet = $this->petService->update($petId, $tutorId, $request->validated());
 
             return $this->sendResponse(
                 data    : ['pet_id' => $pet->id],

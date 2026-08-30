@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('race')->nullable();
             $table->string('color')->nullable();
             $table->text('description')->nullable();
-            $table->string('telephone', 15);
+            $table->string('phone_home', 10)->nullable();
+            $table->string('phone_mobile', 15)->nullable();
             $table->foreignId('report_type_id')->default(1)->constrained('report_types')->cascadeOnDelete();
             $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
             $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
