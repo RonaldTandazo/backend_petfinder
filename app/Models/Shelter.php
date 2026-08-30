@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Catalog\Country;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -56,10 +55,5 @@ class Shelter extends Authenticatable
     public function tutor(): HasOne
     {
         return $this->hasOne(Tutor::class);
-    }
-
-    public function news(): HasMany
-    {
-        return $this->hasMany(ShelterNews::class);
     }
 }

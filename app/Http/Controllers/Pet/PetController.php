@@ -24,8 +24,8 @@ class PetController extends Controller
         try {
             $tutorId = $this->getTutorId();
 
-            $page  = max(1, $request->integer('page', 1));
-            $limit = min(50, max(1, $request->integer('limit', 20)));
+            $page  = $request->integer('page', 1);
+            $limit = $request->integer('limit', 20);
 
             $result = $this->petService->list($tutorId, $page, $limit);
 

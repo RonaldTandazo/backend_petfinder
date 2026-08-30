@@ -5,7 +5,6 @@ namespace App\Services\Pet;
 use App\Jobs\SyncPictureJob;
 use App\Models\Pet;
 use App\Services\Storage\PictureDeletionService;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class PetService

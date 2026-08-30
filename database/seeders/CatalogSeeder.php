@@ -18,6 +18,14 @@ class CatalogSeeder extends Seeder
             ['id' => 3, 'name' => 'Otro', 'tag' => 'OTHER', 'created_at' => $now, 'updated_at' => $now],
         ]);
 
+        // Countries (Usuarios / Refugios)
+        DB::table('countries')->insertOrIgnore([
+            ['id' => 1, 'name' => 'Ecuador', 'abbreviation' => 'EC', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 2, 'name' => 'Perú', 'abbreviation' => 'PE', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 3, 'name' => 'Argentina', 'abbreviation' => 'AR', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 4, 'name' => 'México', 'abbreviation' => 'MX', 'created_at' => $now, 'updated_at' => $now],
+        ]);
+
         // Tutor Types
         DB::table('tutor_types')->insertOrIgnore([
             ['id' => 1, 'name' => 'Persona Particular', 'tag' => 'USER', 'created_at' => $now, 'updated_at' => $now],

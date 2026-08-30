@@ -4,11 +4,12 @@ namespace App\Services\Storage;
 
 use App\Models\Picture;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PictureSyncService
 {
+    public function __construct(protected MediaSyncService $mediaSyncService) {}
+
     public function syncMany(Collection $pictures): void
     {
         $pictures->each(fn (Picture $picture) => $this->syncOne($picture));
@@ -21,21 +22,13 @@ class PictureSyncService
             return;
         }
 
-        $sourceBucket = config('filesystems.disks.s3_temp.bucket');
-        $targetBucket = config('filesystems.disks.s3.bucket');
-        $targetKey    = $picture->path ?? $this->buildKey($picture);
+        $targetKey = $picture->path ?? $this->buildKey($picture);
 
-        Storage::disk('s3')->getClient()->copyObject([
-            'Bucket'            => $targetBucket,
-            'Key'               => $targetKey,
-            'CopySource'        => $sourceBucket . '/' . rawurlencode($picture->path_temp),
-            'MetadataDirective' => 'REPLACE',
-            'Metadata'          => [
-                'id_picture'       => (string) $picture->id,
-                'id_pictureable'   => (string) $picture->pictureable_id,
-                'pictureable_type' => class_basename($picture->pictureable_type),
-                'id_usuario'       => (string) ($picture->uploaded_by_id ?? ''),
-            ],
+        $this->mediaSyncService->copyToPermanentBucket($picture->path_temp, $targetKey, [
+            'id_picture'       => (string) $picture->id,
+            'id_pictureable'   => (string) $picture->pictureable_id,
+            'pictureable_type' => class_basename($picture->pictureable_type),
+            'id_usuario'       => (string) ($picture->uploaded_by_id ?? ''),
         ]);
 
         $picture->update([

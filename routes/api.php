@@ -7,3 +7,4 @@ require __DIR__ . '/Adoption/AdoptionRoutes.php';
 require __DIR__ . '/Webhook/WebhookRoutes.php';
 require __DIR__ . '/Storage/StorageRoutes.php';
 require __DIR__ . '/Picture/PictureRoutes.php';
+require __DIR__ . '/Community/CommunityRoutes.php';

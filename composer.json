@@ -11,7 +11,8 @@
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
-        "league/flysystem-aws-s3-v3": "^3.35"
+        "league/flysystem-aws-s3-v3": "^3.35",
+        "mongodb/laravel-mongodb": "^5.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -20,7 +21,8 @@
         "laravel/pint": "^1.27",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^12.5.12"
+        "phpunit/phpunit": "^12.5.12",
+        "soyuka/stubs-mongodb": "^1.0"
     },
     "autoload": {
         "psr-4": {
