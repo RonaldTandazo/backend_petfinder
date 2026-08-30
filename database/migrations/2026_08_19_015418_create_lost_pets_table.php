@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('lost_pets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
-            $table->foreignId('report_type_id')->default(1)->constrained('report_types')->cascadeOnDelete();
-            $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
-            $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
-            $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->string('name');
             $table->string('race')->nullable();
             $table->string('color')->nullable();
             $table->text('description')->nullable();
+            $table->string('telephone', 15);
+            $table->foreignId('report_type_id')->default(1)->constrained('report_types')->cascadeOnDelete();
+            $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
+            $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
+            $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->boolean('has_reward')->default(false);
             $table->decimal('reward_amound', 10,2)->nullable();
             $table->string('city');
