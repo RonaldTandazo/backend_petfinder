@@ -21,14 +21,14 @@ class Pet extends Model
     protected $fillable = [
         'tutor_id',
         'name',
-        'species_id',
         'race',
         'color',
         'born_date',
         'is_urgent',
+        'description',
+        'species_id',
         'animal_gender_id',
         'size_id',
-        'description',
         'pet_status_id',
     ];
 
