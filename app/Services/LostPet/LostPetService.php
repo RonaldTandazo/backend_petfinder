@@ -11,6 +11,27 @@ class LostPetService
 {
     public function __construct(protected PictureDeletionService $pictureDeletionService) {}
 
+    public function getLostPets(int $page, int $limit): array
+    {
+        $skip = ($page - 1) * $limit;
+
+        $lostPets = LostPet::where('report_status_id', 1)
+            ->where('report_type_id', 1)
+            ->select(['id', 'name', 'race', 'species_id', 'animal_gender_id', 'city', 'event_address', 'longitude', 'latitude', 'event_date', 'report_status_id'])
+            ->with(['animalGender', 'species', 'reportStatus'])
+            ->latest()
+            ->skip($skip)
+            ->take($limit + 1)
+            ->get();
+
+        $hasMore = $lostPets->count() > $limit;
+
+        return [
+            'items'   => $lostPets->take($limit),
+            'hasMore' => $hasMore,
+        ];
+    }
+
     public function create(array $validated, int $tutorId): LostPet
     {
         return DB::transaction(function () use ($validated, $tutorId) {

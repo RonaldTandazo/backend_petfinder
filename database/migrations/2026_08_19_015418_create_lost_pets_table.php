@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
             $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->boolean('has_reward')->default(false);
-            $table->decimal('reward_amound', 10,2)->nullable();
+            $table->decimal('reward_amount', 10,2)->nullable();
             $table->string('city');
             $table->string('event_address')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();

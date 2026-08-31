@@ -26,8 +26,8 @@ class LostPetEvent extends Model
     {
         return [
             'event_date' => 'datetime',
-            'latitude'   => 'decimal:8',
-            'longitude'  => 'decimal:8',
+            'latitude'   => 'double',
+            'longitude'  => 'double',
         ];
     }
 

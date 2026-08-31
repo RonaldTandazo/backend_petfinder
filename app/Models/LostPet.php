@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class LostPet extends Model
 {
@@ -28,7 +29,7 @@ class LostPet extends Model
         'animal_gender_id',
         'size_id',
         'has_reward',
-        'reward_amound',
+        'reward_amount',
         'city',
         'event_address',
         'latitude',
@@ -42,11 +43,11 @@ class LostPet extends Model
     {
         return [
             'has_reward'    => 'boolean',
-            'reward_amound' => 'decimal:2',
+            'reward_amount' => 'double',
             'event_date'    => 'datetime',
             'closing_date'  => 'datetime',
-            'latitude'      => 'decimal:8',
-            'longitude'     => 'decimal:8',
+            'latitude'      => 'double',
+            'longitude'     => 'double',
         ];
     }
 
@@ -88,5 +89,10 @@ class LostPet extends Model
     public function events(): HasMany
     {
         return $this->hasMany(LostPetEvent::class);
+    }
+
+    public function mainPicture(): MorphOne
+    {
+        return $this->morphOne(Picture::class, 'pictureable')->where('is_main', true);
     }
 }

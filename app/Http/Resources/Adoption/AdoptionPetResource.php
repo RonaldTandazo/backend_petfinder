@@ -18,7 +18,7 @@ class AdoptionPetResource extends JsonResource
             'gender_tag' => $this->whenLoaded('animalGender', fn () => $this->animalGender->tag),
             'age'        => $this->age['label'],
             'is_urgent'  => $this->is_urgent,
-            'picture'    => $this->mainPicture->path ? config('services.pets.pictures.host') . $this->mainPicture->path : null
+            'picture'    => config('services.pets.pictures.host') . $this->mainPicture->path
             // distance
         ];
     }

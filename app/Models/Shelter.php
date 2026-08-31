@@ -42,8 +42,8 @@ class Shelter extends Authenticatable
         return [
             'password' => 'hashed',
             'verified' => 'boolean',
-            'latitude' => 'decimal:8',
-            'longitude' => 'decimal:8',
+            'latitude' => 'double',
+            'longitude' => 'double',
         ];
     }
 
