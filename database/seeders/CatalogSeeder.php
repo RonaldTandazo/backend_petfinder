@@ -69,8 +69,8 @@ class CatalogSeeder extends Seeder
 
         // Report Statuses
         DB::table('report_statuses')->insertOrIgnore([
-            ['id' => 1, 'name' => 'Activo / En Búsqueda', 'tag' => 'ACTIVE', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 2, 'name' => 'Resuelto / Retornado', 'tag' => 'RESOLVED', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 1, 'name' => 'Perdido', 'tag' => 'ACTIVE', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 2, 'name' => 'Encontrado', 'tag' => 'RESOLVED', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 3, 'name' => 'Cerrado', 'tag' => 'CLOSED', 'created_at' => $now, 'updated_at' => $now],
         ]);
 
