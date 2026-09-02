@@ -49,29 +49,44 @@ class ReactionService
 
     protected function applyReaction(string $postId, array $author, bool $active): void
     {
-        Post::where('_id', $postId)->raw(function ($collection) use ($postId, $author, $active) {
-            $operator = $active ? '$addToSet' : '$pull';
+        $objectId = new ObjectId($postId);
 
-            $payload = $active
-                ? [
-                    'tutor_id'   => $author['tutor_id'],
-                    'tutor_type' => $author['tutor_type'],
-                    'type'       => self::TYPE,
-                    'created_at' => now()->toIso8601String(),
-                ]
-                : [
-                    'tutor_id' => $author['tutor_id'],
-                    'type'     => self::TYPE,
-                ];
+        $payload = $active
+            ? [
+                'tutor_id'   => $author['tutor_id'],
+                'tutor_type' => $author['tutor_type'],
+                'type'       => self::TYPE,
+            ]
+            : [
+                'tutor_id' => $author['tutor_id'],
+                'type'     => self::TYPE,
+            ];
 
+        Post::where('_id', $postId)->raw(function ($collection) use ($objectId, $payload, $active) {
             $collection->updateOne(
-                ['_id' => new ObjectId($postId)],
+                ['_id' => $objectId],
                 [
-                    $operator => ['reactions' => $payload],
-                    '$inc'    => ['reactions_count' => $active ? 1 : -1],
+                    $active ? '$addToSet' : '$pull' => ['reactions' => $payload],
                 ]
             );
+
+            $this->syncReactionCount($collection, $objectId);
         });
+    }
+
+    protected function syncReactionCount($collection, ObjectId $objectId): void
+    {
+        $doc = $collection->findOne(
+            ['_id' => $objectId],
+            ['projection' => ['reactions' => 1]]
+        );
+
+        $count = count($doc['reactions'] ?? []);
+
+        $collection->updateOne(
+            ['_id' => $objectId],
+            ['$set' => ['reactions_count' => $count]]
+        );
     }
 
     protected function count(string $postId): int

@@ -6,6 +6,8 @@ use App\Http\Controllers\Community\ReactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('community')->group(function () {
+    Route::get('form-catalog', [PostController::class, 'formCatalog']);
+
     Route::get('posts', [PostController::class, 'index']);
     Route::post('posts', [PostController::class, 'store']);
 

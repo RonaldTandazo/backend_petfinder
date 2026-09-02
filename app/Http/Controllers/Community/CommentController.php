@@ -58,11 +58,14 @@ class CommentController extends Controller
             $comment = $this->commentService->store(
                 $postId,
                 $request->input('content'),
-                $this->authorService->build($user)
+                $this->authorService->build($user),
+                $request->input('parent_id')
             );
 
+            $data = $this->commentService->single((string) $comment->id);
+
             return $this->sendResponse(
-                data    : ['comment_id' => (string) $comment->id],
+                data    : $data,
                 message : 'Comentario creado exitosamente',
                 code    : Response::HTTP_CREATED
             );
@@ -97,7 +100,7 @@ class CommentController extends Controller
             );
 
             return $this->sendResponse(
-                data    : ['comment_id' => (string) $comment->id],
+                data    : $this->commentService->single((string) $comment->id),
                 message : 'Comentario actualizado exitosamente'
             );
         } catch (ModelNotFoundException $e) {

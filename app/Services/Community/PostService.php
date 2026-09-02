@@ -2,16 +2,29 @@
 
 namespace App\Services\Community;
 
+use App\Helpers\ValidationErrorHelper;
 use App\Jobs\SyncPostImageJob;
 use App\Models\Catalog\NewsType;
 use App\Models\Community\Comment;
 use App\Models\Community\Post;
 use App\Services\Storage\PurgeS3ObjectService;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Storage;
 
 class PostService
 {
-    public function __construct(protected PurgeS3ObjectService $purgeS3ObjectService) {}
+    public function __construct(
+        protected PurgeS3ObjectService $purgeS3ObjectService,
+        protected CommunityAuthorService $authorService
+    ) {}
+
+    public function formCatalog(Authenticatable $account): array
+    {
+        return [
+            'news_types' => NewsType::query()->orderBy('id')->get(['id', 'name', 'tag']),
+            'me'         => $this->authorService->build($account),
+        ];
+    }
 
     public function publish(array $validated, array $author): Post
     {
@@ -33,11 +46,16 @@ class PostService
         return $post;
     }
 
-    public function list(int $page, int $limit, ?int $tutorId): array
+    public function list(int $page, int $limit, ?int $tutorId, ?string $q = null): array
     {
         $skip  = ($page - 1) * $limit;
 
         $posts = Post::where('status', 'published')
+            ->when($q, fn ($query) => $query->where(function ($builder) use ($q) {
+                $builder->where('title', 'like', "%{$q}%")
+                    ->orWhere('content', 'like', "%{$q}%")
+                    ->orWhere('author.display_name', 'like', "%{$q}%");
+            }))
             ->orderByDesc('published_at')
             ->skip($skip)
             ->take($limit + 1)
@@ -83,13 +101,24 @@ class PostService
     {
         $post = $this->findOwned($postId, $tutorId);
 
-        $post->update([
-            'title'     => $validated['title'] ?? $post->title,
-            'content'   => $validated['content'] ?? $post->content,
-            'news_type' => isset($validated['news_type_id'])
-                ? $this->newsTypeSnapshot($validated['news_type_id'])
-                : $post->news_type,
-        ]);
+        $data = [
+            'title'   => $validated['title'] ?? $post->title,
+            'content' => $validated['content'] ?? $post->content,
+        ];
+
+        if (isset($validated['news_type_id'])) {
+            $data['news_type'] = $this->newsTypeSnapshot($validated['news_type_id']);
+        }
+
+        if (array_key_exists('images', $validated)) {
+            $data['images'] = $this->applyImageChanges($post, $validated['images']);
+        }
+
+        $post->update($data);
+
+        if (array_key_exists('images', $data) && $this->hasPendingSync($data['images'])) {
+            SyncPostImageJob::dispatch($post->refresh())->afterCommit();
+        }
 
         return $post->refresh();
     }
@@ -119,6 +148,69 @@ class PostService
         return ['id' => $newsType->id, 'name' => $newsType->name, 'tag' => $newsType->tag];
     }
 
+    protected function applyImageChanges(Post $post, array $incoming): array
+    {
+        $existing = $post->images ?? [];
+        $byKey    = collect($existing)
+            ->keyBy(fn (array $image) => $image['path'] ?? $image['path_temp'])
+            ->all();
+
+        $result = [];
+
+        foreach ($incoming as $image) {
+            $path     = $image['path'] ?? null;
+            $pathTemp = $image['path_temp'] ?? null;
+
+            if ($path !== null && !isset($byKey[$path])) {
+                ValidationErrorHelper::throwValidationError([
+                    'images' => 'El path indicado no corresponde a una imagen de esta publicación',
+                ]);
+            }
+
+            if ($path === null && $pathTemp !== null) {
+                $result[] = ['path_temp' => $pathTemp, 'path' => null, 'synced' => false];
+
+                continue;
+            }
+
+            if ($pathTemp !== null) {
+                $result[] = ['path_temp' => $pathTemp, 'path' => $path, 'synced' => false];
+
+                continue;
+            }
+
+            if ($path !== null) {
+                $result[] = $byKey[$path];
+            }
+        }
+
+        $resultKeys = array_map(
+            fn (array $image) => $image['path'] ?? $image['path_temp'],
+            $result
+        );
+
+        foreach ($existing as $image) {
+            $key = $image['path'] ?? $image['path_temp'];
+
+            if (!empty($key) && !in_array($key, $resultKeys, true)) {
+                $this->purgeImageEntry($image);
+            }
+        }
+
+        return $result;
+    }
+
+    protected function hasPendingSync(array $images): bool
+    {
+        foreach ($images as $image) {
+            if (empty($image['synced']) && !empty($image['path_temp'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function mapPost(Post $post, bool $reactedByMe): array
     {
         return [
@@ -127,7 +219,7 @@ class PostService
             'news_type'       => $post->news_type,
             'title'           => $post->title,
             'content'         => $post->content,
-            'images'          => $this->imageUrls($post),
+            'images'          => $this->imageItems($post),
             'reactions_count' => $post->reactions_count,
             'comments_count'  => $post->comments_count,
             'reacted_by_me'   => $reactedByMe,
@@ -147,10 +239,13 @@ class PostService
         );
     }
 
-    protected function imageUrls(Post $post): array
+    protected function imageItems(Post $post): array
     {
         return array_map(
-            fn (array $image) => $this->imageUrl($image),
+            fn (array $image) => [
+                'url'  => $this->imageUrl($image),
+                'path' => $image['path'] ?? $image['path_temp'],
+            ],
             $post->images ?? []
         );
     }
@@ -173,13 +268,18 @@ class PostService
     protected function purgeImage(Post $post): void
     {
         foreach ($post->images ?? [] as $image) {
-            if (! empty($image['path'])) {
-                $this->purgeS3ObjectService->purgeAllVersions($image['path']);
-            }
+            $this->purgeImageEntry($image);
+        }
+    }
 
-            if (! empty($image['path_temp']) && empty($image['synced'])) {
-                Storage::disk('s3_temp')->delete($image['path_temp']);
-            }
+    protected function purgeImageEntry(array $image): void
+    {
+        if (!empty($image['path'])) {
+            $this->purgeS3ObjectService->purgeAllVersions($image['path']);
+        }
+
+        if (!empty($image['path_temp']) && empty($image['synced'])) {
+            Storage::disk('s3_temp')->delete($image['path_temp']);
         }
     }
 }

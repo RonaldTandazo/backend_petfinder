@@ -14,15 +14,17 @@ class StoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', 'max:500'],
+            'content'   => ['required', 'string', 'max:500'],
+            'parent_id' => ['nullable', 'string', 'regex:/^[a-f0-9]{24}$/'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'content.required' => 'El contenido del comentario es obligatorio',
-            'content.max'      => 'El comentario no puede superar los 500 caracteres',
+            'content.required'  => 'El contenido del comentario es obligatorio',
+            'content.max'       => 'El comentario no puede superar los 500 caracteres',
+            'parent_id.regex'   => 'La respuesta debe indicar un comentario válido',
         ];
     }
 }

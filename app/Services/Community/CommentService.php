@@ -2,24 +2,33 @@
 
 namespace App\Services\Community;
 
+use App\Helpers\ValidationErrorHelper;
 use App\Models\Community\Comment;
 use App\Models\Community\Post;
 
 class CommentService
 {
-    public function store(string $postId, string $content, array $author): Comment
+    public const MAX_DEPTH = 3;
+
+    public function store(string $postId, string $content, array $author, ?string $parentId = null): Comment
     {
         Post::where('_id', $postId)
             ->where('status', 'published')
             ->firstOrFail();
 
+        if ($parentId !== null) {
+            $this->assertValidParent($parentId, $postId);
+        }
+
         $comment = Comment::create([
-            'post_id' => $postId,
-            'author'  => $author,
-            'content' => $content,
+            'post_id'   => $postId,
+            'parent_id' => $parentId,
+            'author'    => $author,
+            'content'   => $content,
         ]);
 
-        $this->touchCount($postId, 1);
+        // comments_count cuenta SOLO comentarios raíz (las respuestas no suman).
+        $this->touchCount($postId, $parentId === null ? 1 : 0);
 
         return $comment;
     }
@@ -35,17 +44,68 @@ class CommentService
             ->get();
 
         $hasMore = $comments->count() > $limit;
+        $items   = $comments->take($limit);
 
-        $items = $comments->take($limit)->map(fn (Comment $comment) => [
-            'id'         => (string) $comment->id,
-            'author'     => $comment->author,
-            'content'    => $comment->content,
-            'created_at' => $comment->created_at?->toIso8601String(),
-        ]);
+        $parentIds = $items
+            ->pluck('parent_id')
+            ->filter()
+            ->unique()
+            ->all();
+
+        $parents = Comment::whereIn('_id', $parentIds)
+            ->get()
+            ->keyBy(fn (Comment $parent) => (string) $parent->id);
+
+        $itemIds = $items
+            ->pluck('id')
+            ->map(fn ($id) => (string) $id)
+            ->all();
+
+        $repliesCounts = Comment::where('post_id', $postId)
+            ->whereIn('parent_id', $itemIds)
+            ->pluck('parent_id')
+            ->countBy()
+            ->all();
+
+        $mapped = $items->map(function (Comment $comment) use ($parents, $repliesCounts) {
+            $parentId = $comment->parent_id ? (string) $comment->parent_id : null;
+            $parent   = $parentId ? ($parents[$parentId] ?? null) : null;
+
+            return $this->mapItem($comment, $parentId, $parent, $repliesCounts[$parentId] ?? 0);
+        });
 
         return [
-            'items'   => $items,
+            'items'   => $mapped,
             'hasMore' => $hasMore,
+        ];
+    }
+
+    public function single(string $commentId): array
+    {
+        $comment  = Comment::where('_id', $commentId)->firstOrFail();
+        $parentId = $comment->parent_id ? (string) $comment->parent_id : null;
+        $parent   = $parentId ? Comment::where('_id', $parentId)->first() : null;
+
+        $repliesCount = Comment::where('post_id', $comment->post_id)
+            ->where('parent_id', (string) $comment->id)
+            ->count();
+
+        return $this->mapItem($comment, $parentId, $parent, $repliesCount);
+    }
+
+    protected function mapItem(Comment $comment, ?string $parentId, ?Comment $parent, int $repliesCount): array
+    {
+        return [
+            'id'            => (string) $comment->id,
+            'author'        => $comment->author,
+            'content'       => $comment->content,
+            'parent_id'     => $parentId,
+            'parent'        => $parent ? [
+                'tutor_id'     => $parent->author['tutor_id'] ?? null,
+                'display_name' => $parent->author['display_name'] ?? null,
+            ] : null,
+            'replies_count' => $repliesCount,
+            'created_at'    => $comment->created_at?->toIso8601String(),
         ];
     }
 
@@ -66,13 +126,57 @@ class CommentService
             ->where('author.tutor_id', $tutorId)
             ->firstOrFail();
 
-        $comment->delete();
+        $idsToDelete = [$commentId];
+        $cursor      = [$commentId];
 
-        $this->touchCount($comment->post_id, -1);
+        while (!empty($cursor)) {
+            $children = Comment::whereIn('parent_id', $cursor)
+                ->pluck('id')
+                ->map(fn ($id) => (string) $id)
+                ->all();
+
+            $cursor      = $children;
+            $idsToDelete = array_merge($idsToDelete, $children);
+        }
+
+        Comment::whereIn('_id', $idsToDelete)->delete();
+
+        // comments_count cuenta SOLO comentarios padre
+        $this->touchCount($comment->post_id, $comment->parent_id ? 0 : -1);
     }
 
     public function touchCount(string $postId, int $delta): void
     {
         Post::where('_id', $postId)->increment('comments_count', $delta);
+    }
+
+    protected function assertValidParent(string $parentId, string $postId): void
+    {
+        $parent = Comment::where('_id', $parentId)->first();
+
+        if (!$parent || (string) $parent->post_id !== $postId) {
+            ValidationErrorHelper::throwValidationError([
+                'parent_id' => 'El comentario al que respondes no pertenece a esta publicación',
+            ]);
+        }
+
+        $depth  = 1;
+        $cursor = $parent;
+
+        while ($cursor->parent_id && $depth < self::MAX_DEPTH) {
+            $cursor = Comment::where('_id', $cursor->parent_id)->first();
+
+            if (!$cursor) {
+                break;
+            }
+
+            $depth++;
+        }
+
+        if ($depth >= self::MAX_DEPTH) {
+            ValidationErrorHelper::throwValidationError([
+                'parent_id' => 'El hilo de comentarios tiene máximo '.self::MAX_DEPTH.' niveles de profundidad',
+            ]);
+        }
     }
 }

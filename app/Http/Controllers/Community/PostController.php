@@ -22,13 +22,37 @@ class PostController extends Controller
         protected CommunityAuthorService $authorService
     ) {}
 
+    public function formCatalog(Request $request): JsonResponse
+    {
+        try {
+            return $this->sendResponse(
+                data    : $this->postService->formCatalog($request->user()),
+                message : 'Catálogo del formulario de publicación obtenido exitosamente'
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
+            );
+        } catch (Throwable $th) {
+            Log::error('Error obteniendo el catálogo del formulario de publicación: '.$th->getMessage(), ['exception' => $th]);
+
+            return $this->sendError(
+                message : 'No se pudo obtener el catálogo del formulario de publicación',
+                error   : $th->getMessage()
+            );
+        }
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
             $page  = $request->integer('page', 1);
             $limit = $request->integer('limit', 20);
+            $q     = $request->input('q');
 
-            $result = $this->postService->list($page, $limit, $this->getTutorId());
+            $result = $this->postService->list($page, $limit, $this->getTutorId(), $q);
 
             return $this->sendResponse(
                 data    : $result,

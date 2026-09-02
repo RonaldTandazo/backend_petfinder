@@ -3,12 +3,31 @@
 namespace App\Services\Account;
 
 use App\Helpers\ValidationErrorHelper;
+use App\Http\Resources\ShelterResource;
+use App\Http\Resources\UserResource;
+use App\Models\Catalog\Country;
+use App\Models\Catalog\Gender;
 use App\Models\Shelter;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Hash;
 
 class AccountService
 {
+    public function formCatalog(Authenticatable $account): array
+    {
+        $account->load(
+            $account instanceof Shelter ? ['country', 'tutor'] : ['country', 'gender', 'tutor']
+        );
+
+        return [
+            'countries' => Country::query()->orderBy('name')->get(['id', 'name', 'abbreviation']),
+            'genders'   => Gender::query()->orderBy('id')->get(['id', 'name', 'tag']),
+            'me'        => $account instanceof Shelter
+                ? new ShelterResource($account)
+                : new UserResource($account),
+        ];
+    }
+
     public function updateProfile(Authenticatable $account, array $validated): Authenticatable
     {
         $type   = $account instanceof Shelter ? 'shelter' : 'user';
