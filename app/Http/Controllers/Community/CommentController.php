@@ -27,8 +27,9 @@ class CommentController extends Controller
         try {
             $page  = $request->integer('page', 1);
             $limit = $request->integer('limit', 20);
+            $parentId = $request->query('parent_id');
 
-            $result = $this->commentService->list($postId, $page, $limit);
+            $result = $this->commentService->list($postId, $page, $limit, $parentId);
 
             return $this->sendResponse(
                 data    : $result,

@@ -8,8 +8,6 @@ use App\Models\Community\Post;
 
 class CommentService
 {
-    public const MAX_DEPTH = 3;
-
     public function store(string $postId, string $content, array $author, ?string $parentId = null): Comment
     {
         Post::where('_id', $postId)
@@ -33,11 +31,21 @@ class CommentService
         return $comment;
     }
 
-    public function list(string $postId, int $page, int $limit): array
+    public function list(string $postId, int $page, int $limit, ?string $parentId = null): array
     {
         $skip = ($page - 1) * $limit;
 
-        $comments = Comment::where('post_id', $postId)
+        $query = Comment::where('post_id', $postId);
+
+        // validacion para traer al principio comentarios sin respuestas
+        // luego solo traemos respuestas por el comentario padre
+        if ($parentId !== null) {
+            $query->where('parent_id', $parentId);
+        } else {
+            $query->whereNull('parent_id');
+        }
+
+        $comments = $query
             ->orderBy('created_at', 'asc')
             ->skip($skip)
             ->take($limit + 1)
@@ -71,7 +79,7 @@ class CommentService
             $parentId = $comment->parent_id ? (string) $comment->parent_id : null;
             $parent   = $parentId ? ($parents[$parentId] ?? null) : null;
 
-            return $this->mapItem($comment, $parentId, $parent, $repliesCounts[$parentId] ?? 0);
+            return $this->mapItem($comment, $parentId, $parent, $repliesCounts[(string) $comment->id] ?? 0);
         });
 
         return [
@@ -157,25 +165,6 @@ class CommentService
         if (!$parent || (string) $parent->post_id !== $postId) {
             ValidationErrorHelper::throwValidationError([
                 'parent_id' => 'El comentario al que respondes no pertenece a esta publicación',
-            ]);
-        }
-
-        $depth  = 1;
-        $cursor = $parent;
-
-        while ($cursor->parent_id && $depth < self::MAX_DEPTH) {
-            $cursor = Comment::where('_id', $cursor->parent_id)->first();
-
-            if (!$cursor) {
-                break;
-            }
-
-            $depth++;
-        }
-
-        if ($depth >= self::MAX_DEPTH) {
-            ValidationErrorHelper::throwValidationError([
-                'parent_id' => 'El hilo de comentarios tiene máximo '.self::MAX_DEPTH.' niveles de profundidad',
             ]);
         }
     }
