@@ -24,8 +24,14 @@ class Pet extends Model
         'race',
         'color',
         'born_date',
-        'is_urgent',
         'description',
+        'city',
+        'address',
+        'latitude',
+        'longitude',
+        'phone_mobile',
+        'phone_home',
+        'is_urgent',
         'species_id',
         'animal_gender_id',
         'size_id',
@@ -36,6 +42,8 @@ class Pet extends Model
     {
         return [
             'born_date' => 'date',
+            'latitude'      => 'double',
+            'longitude'     => 'double',
             'is_urgent' => 'boolean',
         ];
     }

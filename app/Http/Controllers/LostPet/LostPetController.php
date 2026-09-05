@@ -4,8 +4,8 @@ namespace App\Http\Controllers\LostPet;
 
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Follow\FollowRequest;
 use App\Http\Requests\LostPet\FormLostPetRequest;
-use App\Http\Requests\LostPet\LostPetFollowRequest;
 use App\Http\Requests\LostPet\LostPetsReportsRequest;
 use App\Http\Resources\LostPet\LostPetListResource;
 use App\Http\Resources\LostPet\LostPetResource;
@@ -55,7 +55,7 @@ class LostPetController extends Controller
         }
     }
 
-    public function getLostPetById(int $lostPetId): JsonResponse{
+    public function getLostPet(int $lostPetId): JsonResponse{
         try {
             $lostPet = $this->lostPetService->getLostPetById($lostPetId);
             $sightings = $this->lostPetEventService->getLostPetSightingsByLostPetId($lostPetId);
@@ -181,7 +181,7 @@ class LostPetController extends Controller
         }
     }
 
-    public function handleFollow(int $lostPetId, LostPetFollowRequest $request): JsonResponse
+    public function handleFollow(int $lostPetId, FollowRequest $request): JsonResponse
     {
         try {
             $tutorId = $this->getTutorId();

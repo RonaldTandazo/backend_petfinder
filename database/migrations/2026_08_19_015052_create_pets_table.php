@@ -18,8 +18,14 @@ return new class extends Migration
             $table->string('race')->nullable();
             $table->string('color')->nullable();
             $table->date('born_date');
-            $table->boolean('is_urgent')->default(false);
             $table->text('description')->nullable();
+            $table->string('city');
+            $table->string('address');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('phone_home', 10)->nullable();
+            $table->string('phone_mobile', 15)->nullable();
+            $table->boolean('is_urgent')->default(false);
             $table->foreignId('species_id')->constrained('species')->cascadeOnDelete();
             $table->foreignId('animal_gender_id')->constrained('animal_genders')->cascadeOnDelete();
             $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Pet;
+namespace App\Http\Requests\Adoption;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FormPetRequest extends FormRequest
+class FormAdoptionPetRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,13 +15,20 @@ class FormPetRequest extends FormRequest
     {
         return [
             'name'                => ['required', 'string', 'max:100'],
-            'species_id'          => ['required', 'integer', 'exists:species,id'],
             'race'                => ['nullable', 'string', 'max:50'],
             'color'               => ['nullable', 'string', 'max:50'],
             'born_date'           => ['required', 'date', 'before_or_equal:today'],
+            'description'         => ['nullable', 'string', 'max:500'],
+            'city'                => ['nullable', 'string', 'max:50'],
+            'address'             => ['required', 'string', 'max:100'],
+            'latitude'            => ['nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,8})?$/'],
+            'longitude'           => ['nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,8})?$/'],
+            'phone_home'          => ['nullable', 'string', 'max:10', 'regex:/^[0-9]{7,10}$/'],
+            'phone_mobile'        => ['nullable', 'string', 'max:15', 'regex:/^\+?[0-9]* ?[0-9]*$/'],
+            'is_urgent'           => ['nullable', 'boolean'],
+            'species_id'          => ['required', 'integer', 'exists:species,id'],
             'animal_gender_id'    => ['required', 'integer', 'exists:animal_genders,id'],
             'size_id'             => ['required', 'integer', 'exists:sizes,id'],
-            'description'         => ['nullable', 'string', 'max:500'],
             'pet_status_id'       => ['nullable', 'integer', 'exists:pet_statuses,id'],
             'health_conditions'   => ['nullable', 'array'],
             'health_conditions.*' => ['integer', 'exists:health_conditions,id'],
@@ -60,7 +67,15 @@ class FormPetRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'               => 'El nombre de la mascota es obligatorio',
+            'name.required'               => 'El nombre de la mascota es requerido',
+            'address.required'            => 'La dirección de referencia es requerida',
+            'city.required'               => 'La ciudad es requerida',
+            'latitude.regex'              => 'La latitud debe ser un número válido con máximo 8 decimales',
+            'longitude.regex'             => 'La longitud debe ser un número válido con máximo 8 decimales',
+            'phone_home.max'              => 'El teléfono convencional no debe superar los 10 dígitos.',
+            'phone_home.regex'            => 'El teléfono convencional solo debe contener números (7 a 10 dígitos).',
+            'phone_mobile.max'            => 'El teléfono celular no debe superar los 15 caracteres.',
+            'phone_mobile.regex'          => 'El teléfono celular debe tener un formato válido (ej. +593 962618451 o 0962618451).',
             'species_id.required'         => 'Debe seleccionar una especie',
             'species_id.exists'           => 'La especie seleccionada no es válida',
             'animal_gender_id.required'   => 'Debe seleccionar un género',

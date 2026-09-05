@@ -67,6 +67,7 @@ class FormLostPetRequest extends FormRequest
     {
         return [
             'name.required'               => 'El nombre de la mascota es obligatorio',
+            'city.required'               => 'La ciudad del suceso es requerida',
             'species_id.required'         => 'Debe seleccionar una especie',
             'species_id.exists'           => 'La especie seleccionada no es válida',
             'animal_gender_id.required'   => 'Debe seleccionar un género',

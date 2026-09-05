@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\LostPet;
+namespace App\Http\Requests\Follow;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LostPetFollowRequest extends FormRequest
+class FollowRequest extends FormRequest
 {
     public function authorize(): bool
     {

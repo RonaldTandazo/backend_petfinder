@@ -18,8 +18,7 @@ class LostPetService
 
         $lostPets = LostPet::where('report_status_id', 1)
             ->where('report_type_id', 1)
-            ->select(['id', 'name', 'race', 'species_id', 'animal_gender_id', 'city', 'event_address', 'longitude', 'latitude', 'event_date', 'report_status_id'])
-            ->with(['animalGender', 'species', 'reportStatus'])
+            ->with(['species', 'animalGender', 'reportStatus'])
             ->latest()
             ->skip($skip)
             ->take($limit + 1)
@@ -36,7 +35,7 @@ class LostPetService
     public function getLostPetById(int $lostPetId): LostPet
     {
         $lostPet = LostPet::where('id', $lostPetId)
-            ->with(['reportType', 'species', 'animalGender', 'size', 'reportStatus'])
+            ->with(['species', 'animalGender', 'size', 'reportType', 'reportStatus'])
             ->firstOrFail();
 
         return $lostPet;
