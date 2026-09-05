@@ -21,27 +21,9 @@ class FormLostPetEventRequest extends FormRequest
             'latitude'               => ['nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,8})?$/'],
             'longitude'              => ['nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,8})?$/'],
             'comment'                => ['nullable', 'string', 'max:500'],
-            'photos'                 => [
-                'nullable',
-                'array',
-                'min:1',
-                'max:5',
-                function ($attribute, $value, $fail) {
-                    if (!empty($value)) {
-                        $mainCount = collect($value)->filter(function ($photo) {
-                            return isset($photo['is_main']) && filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN);
-                        })->count();
-
-                        if ($mainCount === 0) {
-                            $fail('Debe seleccionar exactamente una foto como principal');
-                        } elseif ($mainCount > 1) {
-                            $fail('Solo una foto puede ser la principal');
-                        }
-                    }
-                },
-            ],
-            'photos.*.path_temp'  => ['required', 'string', 'max:255'],
-            'photos.*.is_main'    => ['required', 'boolean'],
+            'photos'                 => ['nullable', 'array', 'max:5',],
+            'photos.*.path_temp'     => ['required', 'string', 'max:255'],
+            'photos.*.is_main'       => ['required', 'boolean'],
         ];
     }
 
@@ -56,7 +38,6 @@ class FormLostPetEventRequest extends FormRequest
             'latitude.regex'                => 'La latitud debe ser un número válido con máximo 8 decimales',
             'longitude.regex'               => 'La longitud debe ser un número válido con máximo 8 decimales',
             'photos.array'                  => 'El formato de las fotos es inválido',
-            'photos.min'                    => 'Debe adjuntar mínimo 1 foto',
             'photos.max'                    => 'No puede adjuntar más de 5 fotos',
             'photos.*.path_temp.required'   => 'El archivo temporal de la imagen es obligatorio',
             'photos.*.path_temp.string'     => 'El archivo temporal de la imagen debe ser una cadena válida',

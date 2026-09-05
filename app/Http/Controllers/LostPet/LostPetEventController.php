@@ -5,6 +5,7 @@ namespace App\Http\Controllers\LostPet;
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LostPet\FormLostPetEventRequest;
+use App\Http\Resources\LostPet\LostPetSightingResource;
 use App\Services\LostPet\LostPetEventService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -21,8 +22,12 @@ class LostPetEventController extends Controller
         try {
             $lostPetEvent = $this->lostPetEventService->create($request->validated(), $this->getTutorId());
 
+            $data = [
+                'new_event' => LostPetSightingResource::make($lostPetEvent)
+            ];
+
             return $this->sendResponse(
-                data    : ['lost_pet_event_id' => $lostPetEvent->id],
+                data    : $data,
                 message : 'Evento de Mascota Perdida registrado exitosamente',
                 code    : Response::HTTP_CREATED
             );
