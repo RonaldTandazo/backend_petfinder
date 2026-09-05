@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('lost_pet_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('lost_pet_id')->constrained('lost_pets')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('lost_pet_event_type_id')->constrained('lost_pet_event_types')->cascadeOnDelete(); 
-            $table->text('description');
-            $table->string('address')->nullable();
+            $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
+            $table->foreignId('lost_pet_event_type_id')->deafult(1)->constrained('lost_pet_event_types')->cascadeOnDelete(); 
+            $table->timestamp('event_date');
+            $table->string('event_address');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
-            $table->timestamp('event_date');
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }

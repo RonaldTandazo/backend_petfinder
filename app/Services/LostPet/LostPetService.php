@@ -4,6 +4,7 @@ namespace App\Services\LostPet;
 
 use App\Jobs\SyncPictureJob;
 use App\Models\LostPet;
+use App\Models\LostPetFollows;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Support\Facades\DB;
 
@@ -30,6 +31,15 @@ class LostPetService
             'items'   => $lostPets->take($limit),
             'hasMore' => $hasMore,
         ];
+    }
+
+    public function getLostPetById(int $lostPetId): LostPet
+    {
+        $lostPet = LostPet::where('id', $lostPetId)
+            ->with(['reportType', 'species', 'animalGender', 'size', 'reportStatus'])
+            ->firstOrFail();
+
+        return $lostPet;
     }
 
     public function create(array $validated, int $tutorId): LostPet
@@ -106,5 +116,26 @@ class LostPetService
 
             $lostPet->delete();
         });
+    }
+
+    public function getLostPetFollowState(int $lostPetId, int $tutorId): bool
+    {        
+        return LostPetFollows::where('lost_pet_id', $lostPetId)
+            ->where('tutor_id', $tutorId)
+            ->exists();
+    }
+
+    public function handleFollow(int $lostPetId, int $tutorId, bool $followStatus): void
+    {
+        if ($followStatus) {
+            LostPetFollows::create([
+                'lost_pet_id' => $lostPetId,
+                'tutor_id'    => $tutorId,
+            ]);
+        } else {
+            LostPetFollows::where('lost_pet_id', $lostPetId)
+                ->where('tutor_id', $tutorId)
+                ->delete();
+        }
     }
 }

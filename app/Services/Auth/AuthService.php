@@ -2,6 +2,7 @@
 
 namespace App\Services\Auth;
 
+use App\Http\Resources\Auth\SessionInfoResource;
 use App\Http\Resources\ShelterResource;
 use App\Http\Resources\UserResource;
 use App\Models\Catalog\TutorType;
@@ -14,37 +15,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-    public function findAccountsByEmail(string $email): array
-    {
-        return [
-            'user'    => User::where('email', $email)->first(),
-            'shelter' => Shelter::where('email', $email)->first(),
-        ];
-    }
-
-    public function generateAuthPayload($account, string $type): array
-    {
-        $account->tokens()->delete();
-
-        $tokenName = "{$type}_auth_token";
-        $token     = $account->createToken($tokenName)->plainTextToken;
-
-        if ($type === 'user') {
-            $account->load(['country', 'gender', 'tutor']);
-            $resource = new UserResource($account);
-        } else {
-            $account->load(['country', 'tutor']);
-            $resource = new ShelterResource($account);
-        }
-
-        return [
-            'type'         => $type,
-            'account'      => $resource,
-            'access_token' => $token,
-            'token_type'   => 'Bearer',
-        ];
-    }
-
     public function registerUser(array $validated): User
     {
         return DB::transaction(function () use ($validated) {
@@ -136,11 +106,37 @@ class AuthService
         ];
     }
 
-    public function sessionInfo(Authenticatable $account, bool $isUser): array
+    public function findAccountsByEmail(string $email): array
     {
         return [
-            'type'    => $isUser ? 'user' : 'shelter',
-            'account' => $account,
+            'user'    => User::where('email', $email)->first(),
+            'shelter' => Shelter::where('email', $email)->first(),
+        ];
+    }
+
+    public function generateAuthPayload($account, string $type): array
+    {
+        $account->tokens()->delete();
+
+        $tokenName = "{$type}_auth_token";
+        $token     = $account->createToken($tokenName)->plainTextToken;
+
+        $session_info = $this->sessionInfo($account, $type === 'user');
+
+        return [
+            'session_info' => $session_info,
+            'access_token' => $token,
+            'token_type'   => 'Bearer',
+        ];
+    }
+
+    public function sessionInfo(Authenticatable $account, bool $isUser): array
+    {
+        $account->load(['tutor']);
+
+        return SessionInfoResource::make($account)->toArray(request()) + [
+            'is_shelter' => !$isUser,
+            'is_user'    => $isUser,
         ];
     }
 

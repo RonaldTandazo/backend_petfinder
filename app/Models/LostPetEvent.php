@@ -13,13 +13,13 @@ class LostPetEvent extends Model
 
     protected $fillable = [
         'lost_pet_id',
-        'user_id',
+        'tutor_id',
         'lost_pet_event_type_id',
-        'description',
-        'address',
+        'event_date',
+        'event_address',
         'latitude',
         'longitude',
-        'event_date',
+        'comment',
     ];
 
     protected function casts(): array
@@ -36,9 +36,9 @@ class LostPetEvent extends Model
         return $this->belongsTo(LostPet::class);
     }
 
-    public function user(): BelongsTo
+    public function tutor(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Tutor::class);
     }
 
     public function eventType(): BelongsTo

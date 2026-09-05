@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('has_reward')->default(false);
             $table->decimal('reward_amount', 10,2)->nullable();
             $table->string('city');
-            $table->string('event_address')->nullable();
+            $table->string('event_address');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamp('event_date');
