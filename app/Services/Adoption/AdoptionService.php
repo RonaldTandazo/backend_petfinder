@@ -34,11 +34,11 @@ class AdoptionService
 
     public function getAdoptionPetById(int $petId): Pet
     {
-        $lostPet = Pet::where('id', $petId)
-            ->with(['species', 'animalGender', 'size', 'petStatus'])
+        $pet = Pet::where('id', $petId)
+            ->with(['species', 'animalGender', 'size', 'healthConditions.healthCondition', 'petStatus'])
             ->firstOrFail();
 
-        return $lostPet;
+        return $pet;
     }
 
     public function create(array $validated, int $tutorId): Pet
