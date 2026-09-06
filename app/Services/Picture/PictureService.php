@@ -54,7 +54,7 @@ class PictureService
             $picture = $this->findOwned($pictureId, $tutorId);
 
             if (!$picture->path_temp) {
-                ValidationErrorHelper::throwValidationError('Esta foto no tiene un archivo temporal pendiente.');
+                ValidationErrorHelper::throwValidationError('Esta foto no tiene un archivo temporal pendiente');
             }
 
             return Storage::disk('s3_temp')->temporaryUrl($picture->path_temp, now()->addMinutes(15));
@@ -63,7 +63,7 @@ class PictureService
         $picture = Picture::findOrFail($pictureId);
 
         if (!$picture->path) {
-            ValidationErrorHelper::throwValidationError('Esta foto todavía no está disponible en su ubicación definitiva.');
+            ValidationErrorHelper::throwValidationError('Esta foto todavía no está disponible en su ubicación definitiva');
         }
 
         return Storage::disk('s3')->url($picture->path);

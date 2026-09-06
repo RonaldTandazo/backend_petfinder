@@ -9,7 +9,7 @@ class CustomValidationException extends Exception
 {
     protected array $errors;
 
-    public function __construct(string|array $errors, string $message = 'Los datos proporcionados no son válidos.')
+    public function __construct(string|array $errors, string $message = 'Los datos proporcionados no son válidos')
     {
         $this->errors = $this->normalizeErrors($errors);
 

@@ -14,7 +14,7 @@ class MinioWebhookService
 
         if (!is_array($records)) {
             ValidationErrorHelper::throwValidationError([
-                'Records' => 'El payload del webhook no contiene registros de eventos.',
+                'Records' => 'El payload del webhook no contiene registros de eventos',
             ]);
         }
 

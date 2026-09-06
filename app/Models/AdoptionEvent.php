@@ -12,7 +12,7 @@ class AdoptionEvent extends Model
 
     protected $fillable = [
         'adoption_id',
-        'user_id',
+        'tutor_id',
         'adoption_status_id',
         'comment',
     ];
@@ -22,9 +22,9 @@ class AdoptionEvent extends Model
         return $this->belongsTo(Adoption::class);
     }
 
-    public function user(): BelongsTo
+    public function tutor(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Tutor::class);
     }
 
     public function status(): BelongsTo

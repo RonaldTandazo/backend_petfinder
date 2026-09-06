@@ -22,7 +22,7 @@ class MinioWebhookController extends Controller
             $receivedToken = (string) $request->bearerToken();
 
             if ($expectedToken === '' || !hash_equals($expectedToken, $receivedToken)) {
-                Log::warning('Webhook de MinIO rechazado: token inválido o no configurado.');
+                Log::warning('Webhook de MinIO rechazado: token inválido o no configurado');
 
                 return $this->sendError(
                     message : 'No autorizado',

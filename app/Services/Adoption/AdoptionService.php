@@ -19,6 +19,9 @@ class AdoptionService
 
         $pets = Pet::where('pet_status_id', 1)
             ->with(['species', 'animalGender', 'size', 'healthConditions'])
+            ->when(!empty($filters['tutor_id']), function ($q) use ($filters) {
+                $q->where('tutor_id', $filters['tutor_id']);
+            })
             ->when(!empty($filters['search']), function ($q) use ($filters) {
                 $searchTerm = '%' . trim($filters['search']) . '%';
 

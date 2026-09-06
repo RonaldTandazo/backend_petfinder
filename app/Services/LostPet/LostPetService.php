@@ -13,14 +13,17 @@ class LostPetService
 {
     public function __construct(protected PictureDeletionService $pictureDeletionService) {}
 
-    public function getLostPets(int $page, int $limit): array
+    public function getLostPets(array $filters, int $page, int $limit): array
     {
         $skip = ($page - 1) * $limit;
 
-        $lostPets = LostPet::whereNull('closing_date')
+        $lostPets = LostPet::with(['species', 'animalGender', 'reportStatus'])
+            ->whereNull('closing_date')
             ->where('report_status_id', 1)
             ->where('report_type_id', 1)
-            ->with(['species', 'animalGender', 'reportStatus'])
+            ->when(!empty($filters['tutor_id']), function ($q) use ($filters) {
+                $q->where('tutor_id', $filters['tutor_id']);
+            })
             ->orderByDesc('event_date')
             ->skip($skip)
             ->take($limit + 1)

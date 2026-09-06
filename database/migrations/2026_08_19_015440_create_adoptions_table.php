@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('adoptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
             $table->foreignId('pet_id')->constrained('pets')->cascadeOnDelete();
             $table->foreignId('adoption_status_id')->constrained('adoption_statuses')->cascadeOnDelete();
             $table->timestamp('application_date');

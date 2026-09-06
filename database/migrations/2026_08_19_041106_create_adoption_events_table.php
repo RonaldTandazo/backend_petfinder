@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('adoption_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('adoption_id')->constrained('adoptions')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('tutor_id')->nullable()->constrained('tutors')->nullOnDelete();
             $table->foreignId('adoption_status_id')->constrained('adoption_statuses')->cascadeOnDelete();
             $table->text('comment')->nullable();
             $table->timestamps();

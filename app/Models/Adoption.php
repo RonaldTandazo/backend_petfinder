@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Models\Catalog\AdoptionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Adoption extends Model
 {
     protected $table = 'adoptions';
 
     protected $fillable = [
-        'user_id',
+        'tutor_id',
         'pet_id',
         'adoption_status_id',
         'application_date',
@@ -27,9 +28,9 @@ class Adoption extends Model
         ];
     }
 
-    public function user(): BelongsTo
+    public function tutor(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Tutor::class);
     }
 
     public function pet(): BelongsTo

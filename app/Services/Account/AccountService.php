@@ -5,14 +5,42 @@ namespace App\Services\Account;
 use App\Helpers\ValidationErrorHelper;
 use App\Http\Resources\ShelterResource;
 use App\Http\Resources\UserResource;
+use App\Models\Adoption;
 use App\Models\Catalog\Country;
 use App\Models\Catalog\Gender;
+use App\Models\LostPet;
+use App\Models\LostPetFollows;
+use App\Models\Pet;
+use App\Models\PetFollows;
 use App\Models\Shelter;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Hash;
 
 class AccountService
 {
+    public function getProfileMetrics(int $tutorId): array
+    {
+        $postsCount     = Pet::where('tutor_id', $tutorId)->count() + LostPet::where('tutor_id', $tutorId)->count();
+        $adoptionsCount = Adoption::where('tutor_id', $tutorId)->where('adoption_status_id', 3)->count();
+        $followsCount   = PetFollows::where('tutor_id', $tutorId)->count() + LostPetFollows::where('tutor_id', $tutorId)->count();
+        
+        return [
+            [
+                'label'  => 'Publicaciones',
+                'count'  => $postsCount
+            ],
+            [
+                'label'  => 'Adopciones',
+                'count'  => $adoptionsCount
+            ],
+            [
+                'label'  => 'Favoritos',
+                'count'  => $followsCount,
+                'action' => 'open_followed'
+            ]
+        ];
+    }
+
     public function formCatalog(Authenticatable $account): array
     {
         $account->load(

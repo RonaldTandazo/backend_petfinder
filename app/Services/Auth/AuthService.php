@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthService
 {
@@ -137,6 +138,8 @@ class AuthService
         return SessionInfoResource::make($account)->toArray(request()) + [
             'is_shelter' => !$isUser,
             'is_user'    => $isUser,
+            'name'       => $account?->name,
+            'email'      => $account->email,
         ];
     }
 

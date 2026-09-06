@@ -23,10 +23,10 @@ class UpdatePicturesRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'pictures.required'             => 'Debe indicar al menos una foto a actualizar.',
-            'pictures.array'                => 'El formato de las fotos es inválido.',
-            'pictures.*.id.required'        => 'Cada foto debe indicar su id.',
-            'pictures.*.path_temp.required' => 'Cada foto debe indicar el archivo temporal a usar.',
+            'pictures.required'             => 'Debe indicar al menos una foto a actualizar',
+            'pictures.array'                => 'El formato de las fotos es inválido',
+            'pictures.*.id.required'        => 'Cada foto debe indicar su id',
+            'pictures.*.path_temp.required' => 'Cada foto debe indicar el archivo temporal a usar',
         ];
     }
 }
