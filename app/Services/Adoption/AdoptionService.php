@@ -7,7 +7,6 @@ use App\Models\Pet;
 use App\Models\PetFollows;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ValidatedInput;
 
 class AdoptionService
