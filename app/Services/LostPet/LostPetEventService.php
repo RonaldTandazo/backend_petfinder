@@ -7,6 +7,7 @@ use App\Models\LostPetEvent;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\ValidatedInput;
 
 class LostPetEventService
 {
@@ -16,16 +17,16 @@ class LostPetEventService
     {
         $lostPetEvents = LostPetEvent::where('lost_pet_id', $lostPetId)
             ->where('lost_pet_event_type_id', 1)    
-            ->orderBy('event_date', 'desc')
+            ->orderByDesc('event_date')
             ->get();
 
         return $lostPetEvents;
     }
 
-    public function create(array $validated, int $tutorId): LostPetEvent
+    public function create(ValidatedInput $validated, int $tutorId): LostPetEvent
     {
         return DB::transaction(function () use ($validated, $tutorId) {
-            $lostPetEventData = collect($validated)->except(['photos'])->toArray();
+            $lostPetEventData = $validated->except(['photos']);
             $lostPetEventData['tutor_id'] = $tutorId;
             
             $lostPetEvent = LostPetEvent::create($lostPetEventData);

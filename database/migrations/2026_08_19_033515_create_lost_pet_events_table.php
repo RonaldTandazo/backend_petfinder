@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('lost_pet_id')->constrained('lost_pets')->cascadeOnDelete();
             $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
-            $table->foreignId('lost_pet_event_type_id')->deafult(1)->constrained('lost_pet_event_types')->cascadeOnDelete(); 
+            $table->foreignId('lost_pet_event_type_id')->default(1)->constrained('lost_pet_event_types')->cascadeOnDelete(); 
             $table->timestamp('event_date');
             $table->string('event_address');
             $table->decimal('latitude', 10, 8)->nullable();

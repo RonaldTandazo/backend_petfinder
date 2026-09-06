@@ -27,6 +27,13 @@ class FormLostPetEventRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'lost_pet_event_type_id' => $this->input('lost_pet_event_type_id', 1), 
+        ]);
+    }
+
     public function messages(): array
     {
         return [

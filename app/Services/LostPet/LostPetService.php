@@ -7,6 +7,7 @@ use App\Models\LostPet;
 use App\Models\LostPetFollows;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\ValidatedInput;
 
 class LostPetService
 {
@@ -16,10 +17,11 @@ class LostPetService
     {
         $skip = ($page - 1) * $limit;
 
-        $lostPets = LostPet::where('report_status_id', 1)
+        $lostPets = LostPet::whereNull('closing_date')
+            ->where('report_status_id', 1)
             ->where('report_type_id', 1)
             ->with(['species', 'animalGender', 'reportStatus'])
-            ->latest()
+            ->orderByDesc('event_date')
             ->skip($skip)
             ->take($limit + 1)
             ->get();
@@ -41,15 +43,15 @@ class LostPetService
         return $lostPet;
     }
 
-    public function create(array $validated, int $tutorId): LostPet
+    public function create(ValidatedInput $validated, int $tutorId): LostPet
     {
         return DB::transaction(function () use ($validated, $tutorId) {
-            $lostPetData = collect($validated)->except(['photos'])->toArray();
+            $lostPetData = $validated->except(['photos']);
             $lostPetData['tutor_id'] = $tutorId;
 
             $lostPet = LostPet::create($lostPetData);
 
-            $photos           = $validated['photos'] ?? [];
+            $photos = $validated['photos'] ?? [];
 
             if (!empty($photos)) {
                 $photosToInsert = collect($photos)->map(function ($photo) use ($tutorId) {
@@ -69,14 +71,14 @@ class LostPetService
         });
     }
 
-    public function update(int $lostPetId, int $tutorId, array $validated): LostPet
+    public function update(int $lostPetId, int $tutorId, ValidatedInput $validated): LostPet
     {
         return DB::transaction(function () use ($lostPetId, $tutorId, $validated) {
             $lostPet = LostPet::where('id', $lostPetId)
                 ->where('tutor_id', $tutorId)
                 ->firstOrFail();
 
-            $lostPetData = array_diff_key($validated, ['photos' => '']);
+            $lostPetData = $validated->except(['photos']);
 
             $lostPet->update($lostPetData);
 

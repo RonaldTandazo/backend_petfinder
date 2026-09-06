@@ -85,7 +85,7 @@ class LostPet extends Model
     public function pictures(): MorphMany
     {
         return $this->morphMany(Picture::class, 'pictureable')
-            ->orderBy('is_main', 'desc');
+            ->orderByDesc('is_main');
     }
 
     public function events(): HasMany

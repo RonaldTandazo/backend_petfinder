@@ -18,10 +18,10 @@ class CatalogController extends Controller
 {
     public function __construct(protected CatalogService $catalogService) {}
 
-    public function getPublishPetCatalog(Request $request): JsonResponse
+    public function getPetCatalogs(Request $request): JsonResponse
     {
         try {
-            $catalog = $this->catalogService->getPublishPetCatalog();
+            $catalog = $this->catalogService->getPetCatalogs();
 
             $data = [
                 'species'           => SpeciesResource::collection($catalog['species']),

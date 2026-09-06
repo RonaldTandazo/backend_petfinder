@@ -23,10 +23,12 @@ class AdoptionController extends Controller
     public function getAdoptionPets(AdoptionPetsRequest $request): JsonResponse
     {
         try {
+            $filters = $request->safe()->except(['page', 'limit']);
+
             $page  = $request->integer('page', 1);
             $limit = $request->integer('limit', 20);
 
-            $result = $this->adoptionService->getAdoptionPets($page, $limit);
+            $result = $this->adoptionService->getAdoptionPets($filters, $page, $limit);
 
             $data = [
                 'pets'    => AdoptionPetListResource::collection($result['items']),
@@ -91,7 +93,7 @@ class AdoptionController extends Controller
     public function store(FormAdoptionPetRequest $request): JsonResponse
     {
         try {
-            $pet = $this->adoptionService->create($request->validated(), $this->getTutorId());
+            $pet = $this->adoptionService->create($request->safe(), $this->getTutorId());
 
             return $this->sendResponse(
                 data    : ['pet_id' => $pet->id],
@@ -119,7 +121,7 @@ class AdoptionController extends Controller
         try {
             $tutorId = $this->getTutorId();
 
-            $pet = $this->adoptionService->update($petId, $tutorId, $request->validated());
+            $pet = $this->adoptionService->update($petId, $tutorId, $request->safe());
 
             return $this->sendResponse(
                 data    : ['pet_id' => $pet->id],

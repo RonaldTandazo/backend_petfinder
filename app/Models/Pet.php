@@ -80,7 +80,8 @@ class Pet extends Model
 
     public function pictures(): MorphMany
     {
-        return $this->morphMany(Picture::class, 'pictureable');
+        return $this->morphMany(Picture::class, 'pictureable')
+            ->orderByDesc('is_main');
     }
 
     public function adoptions(): HasMany

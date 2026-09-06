@@ -7,19 +7,44 @@ use App\Models\Pet;
 use App\Models\PetFollows;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\ValidatedInput;
 
 class AdoptionService
 {
     public function __construct(protected PictureDeletionService $pictureDeletionService) {}
 
-    public function getAdoptionPets(int $page, int $limit): array
+    public function getAdoptionPets(array $filters, int $page, int $limit): array
     {
         $skip = ($page - 1) * $limit;
 
         $pets = Pet::where('pet_status_id', 1)
-            ->with(['species', 'animalGender', 'size'])
+            ->with(['species', 'animalGender', 'size', 'healthConditions'])
+            ->when(!empty($filters['search']), function ($q) use ($filters) {
+                $searchTerm = '%' . trim($filters['search']) . '%';
+
+                $q->where(function ($subQuery) use ($searchTerm) {
+                    $subQuery->where('name', 'ILIKE', $searchTerm)
+                        ->orWhere('race', 'ILIKE', $searchTerm)
+                        ->orWhere('color', 'ILIKE', $searchTerm);
+                });
+            })
+            ->when(!empty($filters['species']), function ($q) use ($filters) {
+                $q->whereIn('species_id', $filters['species']);
+            })
+            ->when(!empty($filters['genders']), function ($q) use ($filters) {
+                $q->whereIn('animal_gender_id', $filters['genders']);
+            })
+            ->when(!empty($filters['sizes']), function ($q) use ($filters) {
+                $q->whereIn('size_id', $filters['sizes']);
+            })
+            ->when(!empty($filters['health_conditions']), function ($q) use ($filters) {
+                $q->whereHas('healthConditions', function ($hq) use ($filters) {
+                    $hq->whereIn('pet_health_conditions.health_condition_id', $filters['health_conditions']);
+                });
+            })
             ->orderByDesc('is_urgent')
-            ->latest()
+            ->orderByDesc('created_at')
             ->skip($skip)
             ->take($limit + 1)
             ->get();
@@ -41,10 +66,10 @@ class AdoptionService
         return $pet;
     }
 
-    public function create(array $validated, int $tutorId): Pet
+    public function create(ValidatedInput $validated, int $tutorId): Pet
     {
         return DB::transaction(function () use ($validated, $tutorId) {
-            $petData = collect($validated)->except(['photos', 'health_conditions'])->toArray();
+            $petData = $validated->except(['photos', 'health_conditions']);
             $petData['tutor_id'] = $tutorId;
 
             $pet = Pet::create($petData);
@@ -80,14 +105,14 @@ class AdoptionService
         });
     }
 
-    public function update(int $petId, int $tutorId, array $validated): Pet
+    public function update(int $petId, int $tutorId, ValidatedInput $validated): Pet
     {
         return DB::transaction(function () use ($petId, $tutorId, $validated) {
             $pet = Pet::where('id', $petId)
                 ->where('tutor_id', $tutorId)
                 ->firstOrFail();
 
-            $petData = array_diff_key($validated, ['photos' => '']);
+            $petData = $validated->except(['photos', 'health_conditions']);
 
             $pet->update($petData);
 

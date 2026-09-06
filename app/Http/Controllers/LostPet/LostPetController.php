@@ -95,7 +95,7 @@ class LostPetController extends Controller
     public function store(FormLostPetRequest $request): JsonResponse
     {
         try {
-            $lostPet = $this->lostPetService->create($request->validated(), $this->getTutorId());
+            $lostPet = $this->lostPetService->create($request->safe(), $this->getTutorId());
 
             return $this->sendResponse(
                 data    : ['lost_pet_id' => $lostPet->id],
@@ -123,7 +123,7 @@ class LostPetController extends Controller
         try {
             $tutorId = $this->getTutorId();
 
-            $lostPet = $this->lostPetService->update($lostPetId, $tutorId, $request->validated());
+            $lostPet = $this->lostPetService->update($lostPetId, $tutorId, $request->safe());
 
             return $this->sendResponse(
                 data    : ['lost_pet_id' => $lostPet->id],
