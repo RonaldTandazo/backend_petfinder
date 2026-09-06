@@ -20,7 +20,6 @@ class LostPetEventController extends Controller
     public function store(FormLostPetEventRequest $request): JsonResponse
     {
         try {
-            Log::alert(collect($request->safe()));
             $lostPetEvent = $this->lostPetEventService->create($request->safe(), $this->getTutorId());
 
             $data = [
