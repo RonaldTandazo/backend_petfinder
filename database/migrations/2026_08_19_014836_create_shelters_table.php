@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('web_page')->nullable();
             $table->string('business_hours')->nullable();
-            $table->string('logo')->nullable();
+            $table->string('avatar')->nullable();
             $table->boolean('verified')->default(false);
             $table->timestamps();
         });
