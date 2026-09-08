@@ -27,7 +27,7 @@ class ProfileFields
             'longitude'          => ['nullable', 'numeric', 'between:-180,180'],
             'web_page'           => ['nullable', 'string', 'url', 'max:150'],
             'business_hours'     => ['nullable', 'string', 'max:100'],
-            'logo'               => ['nullable', 'string', 'max:255'],
+            'avatar'             => ['nullable', 'string', 'max:255'],
         ],
     ];
 

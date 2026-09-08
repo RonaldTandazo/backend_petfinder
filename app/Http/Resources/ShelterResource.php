@@ -16,25 +16,15 @@ class ShelterResource extends JsonResource
             'tax_identification' => $this->tax_identification,
             'email'              => $this->email,
             'telephone'          => $this->telephone,
-            'physical_address'   => $this->physical_address,
+            'country_id'         => $this->country_id,
             'city'               => $this->city,
+            'physical_address'   => $this->physical_address,
             'latitude'           => $this->latitude,
             'longitude'          => $this->longitude,
             'web_page'           => $this->web_page,
             'business_hours'     => $this->business_hours,
-            'logo'               => $this->logo,
-            'verified'           => (bool) ($this->verified ?? false),
-            'country'            => $this->whenLoaded('country', function () {
-                return [
-                    'id'           => $this->country->id,
-                    'name'         => $this->country->name,
-                    'abbreviation' => $this->country->abbreviation,
-                ];
-            }),
-            'tutor_id'           => $this->whenLoaded('tutor', function () {
-                return $this->tutor->id;
-            }),
-            'created_at'         => $this->created_at?->toIso8601String(),
+            'avatar'             => $this->avatar,
+            'verified'           => $this->verified,
         ];
     }
 }

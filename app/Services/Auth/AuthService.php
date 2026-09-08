@@ -3,8 +3,6 @@
 namespace App\Services\Auth;
 
 use App\Http\Resources\Auth\SessionInfoResource;
-use App\Http\Resources\ShelterResource;
-use App\Http\Resources\UserResource;
 use App\Models\Catalog\TutorType;
 use App\Models\Shelter;
 use App\Models\Tutor;
@@ -12,7 +10,6 @@ use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class AuthService
 {

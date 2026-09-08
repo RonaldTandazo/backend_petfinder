@@ -13,30 +13,14 @@ class UserResource extends JsonResource
             'id'          => $this->id,
             'first_names' => $this->first_names,
             'last_names'  => $this->last_names,
-            'full_name'   => trim("{$this->first_names} {$this->last_names}"),
+            'full_name'   => trim($this->first_names) . " " . trim($this->last_names),
             'email'       => $this->email,
             'telephone'   => $this->telephone,
+            'country_id'  => $this->country_id,
             'city'        => $this->city,
             'address'     => $this->address,
+            'gender_id'   => $this->gender_id,
             'avatar'      => $this->avatar,
-            'country'     => $this->whenLoaded('country', function () {
-                return [
-                    'id'           => $this->country->id,
-                    'name'         => $this->country->name,
-                    'abbreviation' => $this->country->abbreviation,
-                ];
-            }),
-            'gender'      => $this->whenLoaded('gender', function () {
-                return [
-                    'id'   => $this->gender->id,
-                    'name' => $this->gender->name,
-                    'tag'  => $this->gender->tag,
-                ];
-            }),
-            'tutor_id'     => $this->whenLoaded('tutor', function () {
-                return $this->tutor->id;
-            }),
-            'created_at'  => $this->created_at?->toIso8601String(),
         ];
     }
 }

@@ -29,7 +29,7 @@ class Shelter extends Authenticatable
         'longitude',
         'web_page',
         'business_hours',
-        'logo',
+        'avatar',
         'verified',
     ];
 

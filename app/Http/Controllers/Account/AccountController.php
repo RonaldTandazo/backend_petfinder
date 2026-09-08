@@ -15,7 +15,6 @@ use App\Services\Account\AccountService;
 use App\Services\Adoption\AdoptionService;
 use App\Services\LostPet\LostPetService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -73,12 +72,14 @@ class AccountController extends Controller
         }
     }
 
-    public function formCatalog(Request $request): JsonResponse
+    public function getProfileInfo(): JsonResponse
     {
         try {
+            $data = $this->isUser() ? UserResource::make($this->authenticatedUser()) : ShelterResource::make($this->authenticatedUser());
+
             return $this->sendResponse(
-                data    : $this->accountService->formCatalog($request->user()),
-                message : 'Create de mi perfil obtenido exitosamente'
+                data    : $data,
+                message : 'Información del perfil obtenida exitosamente'
             );
         } catch (CustomValidationException $e) {
             return $this->sendError(
@@ -87,10 +88,10 @@ class AccountController extends Controller
                 code    : $e->getCode()
             );
         } catch (Throwable $th) {
-            Log::error('Error obteniendo vista create del formulario de mi perfil: ' . $th->getMessage(), ['exception' => $th]);
+            Log::error('Error obteniendo la información del perfil: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message : 'No se pudo obtener la vista create del formulario de mi perfil',
+                message : 'No se pudo obtener la información del perfil',
                 error   : $th->getMessage()
             );
         }

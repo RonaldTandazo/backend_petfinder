@@ -2,16 +2,19 @@
 
 namespace App\Services\LostPet;
 
-use App\Jobs\SyncPictureJob;
 use App\Models\LostPetEvent;
 use App\Services\Storage\PictureDeletionService;
+use App\Services\Storage\PictureSyncService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ValidatedInput;
 
 class LostPetEventService
 {
-    public function __construct(protected PictureDeletionService $pictureDeletionService) {}
+    public function __construct(
+        protected PictureDeletionService $pictureDeletionService,
+        protected PictureSyncService $pictureSyncService
+    ) {}
 
     public function getLostPetSightingsByLostPetId(int $lostPetId): Collection
     {
@@ -44,7 +47,7 @@ class LostPetEventService
 
                 $pictures = $lostPetEvent->pictures()->createMany($photosToInsert);
 
-                SyncPictureJob::dispatch($pictures)->afterCommit();
+                $this->pictureSyncService->syncMany($pictures);
             }
 
             return $lostPetEvent;
