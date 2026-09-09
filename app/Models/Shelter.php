@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Catalog\Country;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -21,15 +22,14 @@ class Shelter extends Authenticatable
         'tax_identification',
         'email',
         'password',
-        'telephone',
-        'physical_address',
+        'phone_mobile',
+        'address',
         'country_id',
         'city',
         'latitude',
         'longitude',
         'web_page',
         'business_hours',
-        'avatar',
         'verified',
     ];
 
@@ -55,5 +55,10 @@ class Shelter extends Authenticatable
     public function tutor(): HasOne
     {
         return $this->hasOne(Tutor::class);
+    }
+
+    public function avatar(): MorphOne
+    {
+        return $this->morphOne(Picture::class, 'pictureable')->where('is_main', true);
     }
 }

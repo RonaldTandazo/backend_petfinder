@@ -37,8 +37,18 @@ class Tutor extends Model
         return $this->hasMany(Pet::class);
     }
 
+    public function adoptions(): HasMany
+    {
+        return $this->hasMany(Adoption::class);
+    }
+
     public function lostPets(): HasMany
     {
         return $this->hasMany(LostPet::class);
+    }
+
+    public function lostPetEvents(): HasMany
+    {
+        return $this->hasMany(LostPetEvent::class);
     }
 }

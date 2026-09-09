@@ -18,15 +18,14 @@ return new class extends Migration
             $table->string('tax_identification')->nullable();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('telephone')->nullable();
-            $table->string('physical_address')->nullable();
+            $table->string('phone_mobile')->nullable();
+            $table->string('address')->nullable();
             $table->foreignId('country_id')->nullable()->constrained('countries')->cascadeOnDelete();
             $table->string('city')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('web_page')->nullable();
             $table->string('business_hours')->nullable();
-            $table->string('avatar')->nullable();
             $table->boolean('verified')->default(false);
             $table->timestamps();
         });

@@ -100,14 +100,14 @@ class AccountController extends Controller
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         try {
-            $account = $this->accountService->updateProfile($request->user(), $request->validated());
+            $isUser = $this->isUser();
 
-            $resource = $this->isShelter()
-                ? new ShelterResource($account)
-                : new UserResource($account);
+            $account = $this->accountService->updateProfile($this->authenticatedUser(), $request->safe());
+
+            $data = $isUser ? UserResource::make($account) : ShelterResource::make($account);
 
             return $this->sendResponse(
-                data    : $resource,
+                data    : $data,
                 message : 'Perfil actualizado exitosamente'
             );
         } catch (CustomValidationException $e) {
@@ -129,7 +129,7 @@ class AccountController extends Controller
     public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {
         try {
-            $this->accountService->updatePassword($request->user(), $request->validated());
+            $this->accountService->updatePassword($request->user(), $request->safe());
 
             return $this->sendResponse(
                 message : 'Contraseña actualizada exitosamente'

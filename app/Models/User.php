@@ -6,8 +6,8 @@ use App\Models\Catalog\Country;
 use App\Models\Catalog\Gender;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -23,12 +23,11 @@ class User extends Authenticatable
         'last_names',
         'email',
         'password',
-        'telephone',
+        'phone_mobile',
         'country_id',
         'gender_id',
         'city',
         'address',
-        'avatar',
     ];
 
     protected $hidden = [
@@ -57,20 +56,15 @@ class User extends Authenticatable
         return $this->hasOne(Tutor::class);
     }
 
-    public function adoptions(): HasMany
-    {
-        return $this->hasMany(Adoption::class);
-    }
-
-    public function lostPetEvents(): HasMany
-    {
-        return $this->hasMany(LostPetEvent::class);
-    }
-
     protected function name(): Attribute
     {
         return Attribute::make(
             get: fn () => trim($this->first_names) . " ". trim($this->last_names)
         );
+    }
+
+    public function avatar(): MorphOne
+    {
+        return $this->morphOne(Picture::class, 'pictureable')->where('is_main', true);
     }
 }

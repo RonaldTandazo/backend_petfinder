@@ -15,15 +15,15 @@ class ShelterResource extends JsonResource
             'business_name'      => $this->business_name,
             'tax_identification' => $this->tax_identification,
             'email'              => $this->email,
-            'telephone'          => $this->telephone,
+            'phone_mobile'       => $this->phone_mobile,
             'country_id'         => $this->country_id,
             'city'               => $this->city,
-            'physical_address'   => $this->physical_address,
+            'address'            => $this->address,
             'latitude'           => $this->latitude,
             'longitude'          => $this->longitude,
             'web_page'           => $this->web_page,
             'business_hours'     => $this->business_hours,
-            'avatar'             => $this->avatar,
+            'avatar'             => config('services.pets.pictures.host') . $this->avatar->path,
             'verified'           => $this->verified,
         ];
     }

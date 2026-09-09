@@ -8,12 +8,18 @@ use App\Models\LostPet;
 use App\Models\LostPetFollows;
 use App\Models\Pet;
 use App\Models\PetFollows;
-use App\Models\Shelter;
+use App\Services\Storage\PictureSyncService;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\ValidatedInput;
 
 class AccountService
 {
+    public function __construct(
+        protected PictureSyncService $pictureSyncService
+    ) {}
+
     public function getProfileMetrics(int $tutorId): array
     {
         $postsCount     = Pet::where('tutor_id', $tutorId)->count() + LostPet::where('tutor_id', $tutorId)->count();
@@ -37,21 +43,36 @@ class AccountService
         ];
     }
 
-    public function updateProfile(Authenticatable $account, array $validated): Authenticatable
+    public function updateProfile(Authenticatable $account, ValidatedInput $validated): Authenticatable
     {
-        $type   = $account instanceof Shelter ? 'shelter' : 'user';
-        $fields = array_intersect_key($validated, ProfileFields::fieldsFor($type));
-
-        if ($fields) {
+        return DB::transaction(function () use ($validated, $account) {
+            $fields = $validated->except(['avatar']);
+    
             $account->fill($fields)->save();
-        }
 
-        $account->load($type === 'user' ? ['country', 'gender', 'tutor'] : ['country', 'tutor']);
-
-        return $account;
+            $pictures = $account->avatar()->delete();
+    
+            $photos = $validated['avatar'] ?? [];
+    
+            if (!empty($photos)) {
+                $photosToInsert = collect($photos)->map(function ($photo) use ($account) {
+                    return [
+                        'path_temp'      => $photo['path_temp'],
+                        'is_main'        => filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN),
+                        'uploaded_by_id' => $account->tutor->id,
+                    ];
+                })->toArray();
+    
+                $pictures = $account->avatar()->createMany($photosToInsert);
+    
+                $this->pictureSyncService->syncMany($pictures);
+            }
+    
+            return $account;
+        });
     }
 
-    public function updatePassword(Authenticatable $account, array $validated): void
+    public function updatePassword(Authenticatable $account, ValidatedInput $validated): void
     {
         if (!Hash::check($validated['current_password'], $account->password)) {
             ValidationErrorHelper::throwValidationError([

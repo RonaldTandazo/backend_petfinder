@@ -135,8 +135,6 @@ class AuthService
         return SessionInfoResource::make($account)->toArray(request()) + [
             'is_shelter' => !$isUser,
             'is_user'    => $isUser,
-            'name'       => $account?->name,
-            'email'      => $account->email,
         ];
     }
 
