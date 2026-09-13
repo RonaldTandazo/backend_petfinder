@@ -17,8 +17,8 @@ class AdoptionService
     {
         $skip = ($page - 1) * $limit;
 
-        $pets = Pet::where('pet_status_id', 1)
-            ->with(['species', 'animalGender', 'size', 'healthConditions'])
+        $pets = Pet::with(['species', 'animalGender', 'size', 'healthConditions'])
+            ->where('pet_status_id', 1)
             ->when(!empty($filters['tutor_id']), function ($q) use ($filters) {
                 $q->where('tutor_id', $filters['tutor_id']);
             })

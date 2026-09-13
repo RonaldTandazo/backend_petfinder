@@ -25,10 +25,12 @@ class LostPetController extends Controller
     public function getLostPets(LostPetsReportsRequest $request): JsonResponse
     {
         try {
+            $filters = $request->safe()->except(['page', 'limit']);
+
             $page  = $request->integer('page', 1);
             $limit = $request->integer('limit', 20);
 
-            $result = $this->lostPetService->getLostPets(filters: [], page: $page, limit: $limit);
+            $result = $this->lostPetService->getLostPets($filters, $page, $limit);
 
             $data = [
                 'lost_pets' => LostPetListResource::collection($result['items']),

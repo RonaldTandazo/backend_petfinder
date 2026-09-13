@@ -24,6 +24,24 @@ class LostPetService
             ->when(!empty($filters['tutor_id']), function ($q) use ($filters) {
                 $q->where('tutor_id', $filters['tutor_id']);
             })
+            ->when(!empty($filters['search']), function ($q) use ($filters) {
+                $searchTerm = '%' . trim($filters['search']) . '%';
+
+                $q->where(function ($subQuery) use ($searchTerm) {
+                    $subQuery->where('name', 'ILIKE', $searchTerm)
+                        ->orWhere('race', 'ILIKE', $searchTerm)
+                        ->orWhere('color', 'ILIKE', $searchTerm);
+                });
+            })
+            ->when(!empty($filters['species']), function ($q) use ($filters) {
+                $q->whereIn('species_id', $filters['species']);
+            })
+            ->when(!empty($filters['genders']), function ($q) use ($filters) {
+                $q->whereIn('animal_gender_id', $filters['genders']);
+            })
+            ->when(!empty($filters['sizes']), function ($q) use ($filters) {
+                $q->whereIn('size_id', $filters['sizes']);
+            })
             ->orderByDesc('event_date')
             ->skip($skip)
             ->take($limit + 1)
