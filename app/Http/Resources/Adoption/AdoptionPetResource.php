@@ -33,7 +33,14 @@ class AdoptionPetResource extends JsonResource
             'pet_status_tag'    => $this->whenLoaded('petStatus', fn () => $this->petStatus->tag),
             'pet_status'        => $this->whenLoaded('petStatus', fn () => $this->petStatus->name),            
             'age'               => $this->age['label'],
-            'health_conditions' => $this->whenLoaded('healthConditions', fn () => $this->healthConditions->map(fn ($item) => $item->healthCondition->name)),
+            'health_conditions' => $this->whenLoaded('healthConditions',
+                fn () => $this->healthConditions->map(
+                    fn ($item) => [
+                        'id' => $item->healthCondition->id,
+                        'name' => $item->healthCondition->name,
+                    ]
+                )
+            ),
             'pictures'          => $this->pictures->map(fn ($picture) => config('services.pets.pictures.host') . $picture->path)
         ];
     }

@@ -29,14 +29,17 @@ class AccountService
         return [
             [
                 'label'  => 'Publicaciones',
+                'tag'    => 'POSTINGS',
                 'count'  => $postsCount
             ],
             [
                 'label'  => 'Adopciones',
+                'tag'    => 'ADOPTIONS',
                 'count'  => $adoptionsCount
             ],
             [
                 'label'  => 'Favoritos',
+                'tag'    => 'FAVOURITES',
                 'count'  => $followsCount,
                 'action' => 'open_followed'
             ]
