@@ -14,7 +14,11 @@ class SessionInfoResource extends JsonResource
             'tutor_id' => $this->whenLoaded('tutor', fn () => $this->tutor->id),
             'name'     => $this->name,
             'email'    => $this->email,
-            'avatar'   => config('services.pets.pictures.host') . $this->avatar->path,
+            'avatar'   => $this->avatar ? [
+                'id'      => $this->avatar->id,
+                'url'     => config('services.pets.pictures.host') . $this->avatar->path,
+                'is_main' => $this->avatar->is_main,
+            ] : null
         ];
     }
 }

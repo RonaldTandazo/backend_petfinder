@@ -8,6 +8,7 @@ use App\Models\LostPet;
 use App\Models\LostPetFollows;
 use App\Models\Pet;
 use App\Models\PetFollows;
+use App\Services\Storage\PictureDeletionService;
 use App\Services\Storage\PictureSyncService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,8 @@ use Illuminate\Support\ValidatedInput;
 class AccountService
 {
     public function __construct(
-        protected PictureSyncService $pictureSyncService
+        protected PictureSyncService $pictureSyncService,
+        protected PictureDeletionService $pictureDeletionService
     ) {}
 
     public function getProfileMetrics(int $tutorId): array
@@ -50,28 +52,76 @@ class AccountService
     {
         return DB::transaction(function () use ($validated, $account) {
             $fields = $validated->except(['avatar']);
-    
+
             $account->fill($fields)->save();
 
-            $pictures = $account->avatar()->delete();
-    
-            $photos = $validated['avatar'] ?? [];
-    
-            if (!empty($photos)) {
-                $photosToInsert = collect($photos)->map(function ($photo) use ($account) {
-                    return [
-                        'path_temp'      => $photo['path_temp'],
-                        'is_main'        => filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN),
+            if (isset($validated['avatar'])) {
+                $photos = collect($validated['avatar']);
+
+                $existingPictures = $account->avatar()->get()->keyBy('id');
+
+                $receivedExistingIds = $photos->where('type', 'existing')->pluck('id')->map(fn ($id) => (int) $id)->values();
+
+                $invalidIds = $receivedExistingIds->filter(fn ($id) => !$existingPictures->has($id));
+
+                if ($invalidIds->isNotEmpty()) {
+                    throw new \InvalidArgumentException(
+                        'Una o más imágenes no pertenecen a este perfil.'
+                    );
+                }
+
+                $picturesToDelete = $existingPictures
+                    ->filter(
+                        fn ($picture) =>
+                            !$receivedExistingIds->contains($picture->id)
+                    );
+
+                foreach ($picturesToDelete as $picture) {
+                    $this->pictureDeletionService->delete($picture);
+                    $picture->delete();
+                }
+
+                foreach ($photos->where('type', 'existing') as $photo) {
+                    $picture = $existingPictures->get((int) $photo['id']);
+
+                    if (!$picture) {
+                        continue;
+                    }
+
+                    $picture->update([
+                        'is_main' => filter_var(
+                            $photo['is_main'],
+                            FILTER_VALIDATE_BOOLEAN
+                        ),
                         'uploaded_by_id' => $account->tutor->id,
-                    ];
-                })->toArray();
-    
-                $pictures = $account->avatar()->createMany($photosToInsert);
-    
-                $this->pictureSyncService->syncMany($pictures);
+                    ]);
+                }
+
+                $newPhotos = $photos->where('type', 'new');
+
+                if ($newPhotos->isNotEmpty()) {
+                    $photosToInsert = $newPhotos
+                        ->map(function ($photo) use ($account) {
+                            return [
+                                'path_temp' => $photo['path_temp'],
+                                'is_main' => filter_var(
+                                    $photo['is_main'],
+                                    FILTER_VALIDATE_BOOLEAN
+                                ),
+                                'uploaded_by_id' => $account->tutor->id,
+                            ];
+                        })
+                        ->values()
+                        ->toArray();
+
+                    $pictures = $account->avatar()
+                        ->createMany($photosToInsert);
+
+                    $this->pictureSyncService->syncMany($pictures);
+                }
             }
-    
-            return $account;
+
+            return $account->fresh(['avatar']);
         });
     }
 

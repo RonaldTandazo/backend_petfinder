@@ -164,7 +164,6 @@ class AdoptionService
                                 $photo['is_main'],
                                 FILTER_VALIDATE_BOOLEAN
                             ),
-                            'sort_order'     => $photo['sort_order'],
                             'uploaded_by_id' => $tutorId,
                         ];
                     })->values()->toArray();

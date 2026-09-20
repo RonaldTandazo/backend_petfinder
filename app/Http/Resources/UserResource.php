@@ -20,7 +20,11 @@ class UserResource extends JsonResource
             'city'         => $this->city,
             'address'      => $this->address,
             'gender_id'    => $this->gender_id,
-            'avatar'       => config('services.pets.pictures.host') . $this->avatar->path
+            'avatar'       => $this->avatar ? [
+                'id'      => $this->avatar->id,
+                'url'     => config('services.pets.pictures.host') . $this->avatar->path,
+                'is_main' => $this->avatar->is_main,
+            ] : null
         ];
     }
 }

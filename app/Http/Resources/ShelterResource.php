@@ -23,7 +23,11 @@ class ShelterResource extends JsonResource
             'longitude'          => $this->longitude,
             'web_page'           => $this->web_page,
             'business_hours'     => $this->business_hours,
-            'avatar'             => config('services.pets.pictures.host') . $this->avatar->path,
+            'avatar'             => $this->avatar ? [
+                'id'      => $this->avatar->id,
+                'url'     => config('services.pets.pictures.host') . $this->avatar->path,
+                'is_main' => $this->avatar->is_main,
+            ] : null,
             'verified'           => $this->verified,
         ];
     }
