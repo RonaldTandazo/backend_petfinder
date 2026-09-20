@@ -1,18 +1,18 @@
 <?php
 
-return [
+$isProduction = env('APP_ENV') === 'production';
 
-    /*
-    |--------------------------------------------------------------------------
-    | Third Party Services
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Resend, Postmark, AWS, and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
-    */
+$picturesHost = env('AWS_URL_LOCAL', 'http://localhost:9000')
+    . '/' . env('AWS_BUCKET_LOCAL', 'petfinder-pictures')
+    . '/';
+
+if ($isProduction) {
+    $picturesHost = env('AWS_URL')
+        . '/' . env('AWS_BUCKET', 'petfinder-pictures')
+        . '/';
+}
+
+return [
 
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
@@ -39,9 +39,7 @@ return [
         'webhook_token' => env('MINIO_WEBHOOK_TOKEN'),
     ],
 
-    'pets' => [
-        'pictures' => [
-            'host' => env('AWS_URL', 'http://localhost:9000') . '/' . env('AWS_BUCKET', 'petfinder-pictures') . '/'
-        ]
-    ]
+    'pictures' => [
+        'host' => $picturesHost,
+    ],
 ];

@@ -22,7 +22,7 @@ class AdoptionPetListResource extends JsonResource
             'latitude'   => $this->latitude,
             'longitude'  => $this->longitude,
             'is_urgent'  => $this->is_urgent,
-            'picture'    => config('services.pets.pictures.host') . $this->mainPicture->path
+            'picture'    => config('services.pictures.host') . $this->mainPicture->path
             // distance
         ];
     }

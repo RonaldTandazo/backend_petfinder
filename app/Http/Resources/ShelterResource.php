@@ -25,7 +25,7 @@ class ShelterResource extends JsonResource
             'business_hours'     => $this->business_hours,
             'avatar'             => $this->avatar ? [
                 'id'      => $this->avatar->id,
-                'url'     => config('services.pets.pictures.host') . $this->avatar->path,
+                'url'     => config('services.pictures.host') . $this->avatar->path,
                 'is_main' => $this->avatar->is_main,
             ] : null,
             'verified'           => $this->verified,

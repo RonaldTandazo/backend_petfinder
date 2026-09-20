@@ -44,7 +44,7 @@ class AdoptionPetResource extends JsonResource
             'pictures'         => $this->pictures->map(
                 fn ($picture) => [
                     'id'      => $picture->id,
-                    'url'     => config('services.pets.pictures.host') . $picture->path,
+                    'url'     => config('services.pictures.host') . $picture->path,
                     'is_main' => $picture->is_main,
                 ]
             )
