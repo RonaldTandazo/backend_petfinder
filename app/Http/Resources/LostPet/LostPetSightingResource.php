@@ -17,7 +17,13 @@ class LostPetSightingResource extends JsonResource
             'latitude'      => $this->latitude,
             'longitude'     => $this->longitude,
             'comment'       => $this->comment,
-            'pictures'      => $this->pictures->map(fn ($picture) => config('services.pets.pictures.host') . $picture->path),
+            'pictures'      => $this->pictures->map(
+                fn ($picture) => [
+                    'id'      => $picture->id,
+                    'url'     => config('services.pets.pictures.host') . $picture->path,
+                    'is_main' => $picture->is_main,
+                ]
+            )
         ];
     }
 }

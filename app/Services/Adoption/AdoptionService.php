@@ -119,17 +119,55 @@ class AdoptionService
             $pet->update($petData);
 
             if (isset($validated['photos'])) {
-                $pet->pictures->each(fn ($picture) => $this->pictureDeletionService->delete($picture));
-                $pet->pictures()->delete();
+                $photos = collect($validated['photos']);
 
-                if (!empty($validated['photos'])) {
-                    $photosToInsert = collect($validated['photos'])->map(function ($photo) use ($tutorId) {
+                $existingPictures = $pet->pictures()->get()->keyBy('id');
+
+                $receivedExistingIds = $photos->where('type', 'existing')->pluck('id')->map(fn ($id) => (int) $id)->values();
+
+                $invalidIds = $receivedExistingIds->filter(fn ($id) => !$existingPictures->has($id));
+
+                if ($invalidIds->isNotEmpty()) {
+                    throw new \InvalidArgumentException(
+                        'Una o más imágenes no pertenecen a esta publicación.'
+                    );
+                }
+
+                $picturesToDelete = $existingPictures->filter(fn ($picture) => !$receivedExistingIds->contains($picture->id));
+
+                foreach ($picturesToDelete as $picture) {
+                    $this->pictureDeletionService->delete($picture);
+                    $picture->delete();
+                }
+
+                foreach ($photos->where('type', 'existing') as $photo) {
+                    $picture = $existingPictures->get((int) $photo['id']);
+
+                    if (!$picture) continue;
+
+                    $picture->update([
+                        'is_main'        => filter_var(
+                            $photo['is_main'],
+                            FILTER_VALIDATE_BOOLEAN
+                        ),
+                        'uploaded_by_id' => $tutorId,
+                    ]);
+                }
+
+                $newPhotos = $photos->where('type', 'new');
+
+                if ($newPhotos->isNotEmpty()) {
+                    $photosToInsert = $newPhotos->map(function ($photo) use ($tutorId) {
                         return [
                             'path_temp'      => $photo['path_temp'],
-                            'is_main'        => filter_var($photo['is_main'], FILTER_VALIDATE_BOOLEAN),
+                            'is_main'        => filter_var(
+                                $photo['is_main'],
+                                FILTER_VALIDATE_BOOLEAN
+                            ),
+                            'sort_order'     => $photo['sort_order'],
                             'uploaded_by_id' => $tutorId,
                         ];
-                    })->toArray();
+                    })->values()->toArray();
 
                     $pictures = $pet->pictures()->createMany($photosToInsert);
 
@@ -137,7 +175,7 @@ class AdoptionService
                 }
             }
 
-            return $pet;
+            return $pet->fresh(['pictures']);
         });
     }
 

@@ -38,7 +38,13 @@ class LostPetResource extends JsonResource
             'report_status_tag' => $this->whenLoaded('reportStatus', fn () => $this->reportStatus->tag),
             'report_status'     => $this->whenLoaded('reportStatus', fn () => $this->reportStatus->name),
             'closing_date'      => $this->closing_date?->toIso8601String(),
-            'pictures'          => $this->pictures->map(fn ($picture) => config('services.pets.pictures.host') . $picture->path),
+            'pictures'          => $this->pictures->map(
+                fn ($picture) => [
+                    'id'      => $picture->id,
+                    'url'     => config('services.pets.pictures.host') . $picture->path,
+                    'is_main' => $picture->is_main,
+                ]
+            )
         ];
     }
 }
