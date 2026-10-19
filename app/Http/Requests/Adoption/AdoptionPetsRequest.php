@@ -18,7 +18,7 @@ class AdoptionPetsRequest extends FormRequest
             'species'             => ['nullable', 'array'],
             'species.*'           => ['integer', 'exists:species,id'],
             'genders'             => ['nullable', 'array'],
-            'genders.*'           => ['integer', 'exists:animal_gender,id'],
+            'genders.*'           => ['integer', 'exists:animal_genders,id'],
             'sizes'               => ['nullable', 'array'],
             'sizes.*'             => ['integer', 'exists:sizes,id'],
             'health_conditions'   => ['nullable', 'array'],
