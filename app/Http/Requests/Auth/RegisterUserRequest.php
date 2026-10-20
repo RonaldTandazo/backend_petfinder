@@ -17,6 +17,7 @@ class RegisterUserRequest extends FormRequest
         return [
             'first_names'        => ['required', 'string', 'max:50'],
             'last_names'         => ['required', 'string', 'max:50'],
+            'birth_date'         => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->toDateString()],
             'email'              => ['required', 'string', 'email', 'max:50', 'unique:users,email'],
             'password'           => ['required', 'string', Password::defaults()],
             'phone_mobile'       => ['nullable', 'string', 'max:15', 'regex:/^\+?[0-9]* ?[0-9]*$/'],
@@ -37,6 +38,9 @@ class RegisterUserRequest extends FormRequest
             'first_names.max'             => 'Los nombres no pueden superar los 50 caracteres',
             'last_names.required'         => 'Los apellidos son obligatorios',
             'last_names.max'              => 'Los apellidos no pueden superar los 50 caracteres',
+            'birth_date.required'         => 'La fecha de nacimiento es obligatoria',
+            'birth_date.date'             => 'La fecha de nacimiento no es válida',
+            'birth_date.before_or_equal'  => 'Debes tener al menos 18 años para registrarte',
             'email.required'              => 'El correo electrónico es obligatorio',
             'email.email'                 => 'El correo electrónico debe tener un formato válido',
             'email.unique'                => 'El correo electrónico ya se encuentra registrado',
