@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\RegisterUserRequest;
-use App\Http\Requests\Auth\RegisterShelterRequest;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterShelterRequest;
+use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Services\Auth\AuthService;
+use App\Services\Legal\LegalDocumentAcceptanceService;
+use App\Services\Legal\LegalDocumentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,13 +19,30 @@ use Throwable;
 class AuthController extends Controller
 {
     public function __construct(
-        protected AuthService $authService
+        protected AuthService $authService,
+        protected LegalDocumentService $legalDocumentService,
+        protected LegalDocumentAcceptanceService $legalDocumentAcceptanceService
     ) {}
 
     public function registerUser(RegisterUserRequest $request): JsonResponse
     {
         try {
-            $this->authService->registerUser($request->validated());
+            $user = $this->authService->registerUser($request->validated());
+            $legalDocuments = $this->legalDocumentService->getCurrentVersions();
+
+            $legalAcceptances = [];
+
+            foreach ($legalDocuments as $document => $detail) {
+                $legalAcceptances[] = [
+                    'tutor_id'                  => $user->tutor->id,
+                    'legal_document_version_id' => $detail['version_id'],
+                    'accepted_at'               => now(),
+                    'created_at'                => now(),
+                    'updated_at'                => now(),
+                ];
+            }
+
+            $this->legalDocumentAcceptanceService->store($legalAcceptances);
 
             return $this->sendResponse(
                 message : 'Usuario registrado exitosamente',
@@ -49,9 +68,23 @@ class AuthController extends Controller
     {
         try {
             $shelter = $this->authService->registerShelter($request->validated());
+            $legalDocuments = $this->legalDocumentService->getCurrentVersions();
+
+            $legalAcceptances = [];
+
+            foreach ($legalDocuments as $document => $detail) {
+                $legalAcceptances[] = [
+                    'tutor_id'                  => $shelter->tutor->id,
+                    'legal_document_version_id' => $detail['version_id'],
+                    'accepted_at'               => now(),
+                    'created_at'                => now(),
+                    'updated_at'                => now(),
+                ];
+            }
+
+            $this->legalDocumentAcceptanceService->store($legalAcceptances);
 
             return $this->sendResponse(
-                data    : ['shelter_id' => $shelter->id],
                 message : 'Refugio registrado exitosamente',
                 code    : Response::HTTP_CREATED
             );
