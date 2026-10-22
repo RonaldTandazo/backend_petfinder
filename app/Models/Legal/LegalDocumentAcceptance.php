@@ -6,7 +6,7 @@ use App\Models\Tutor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class LegalDocumentAcceptances extends Model
+class LegalDocumentAcceptance extends Model
 {
     protected $table = 'legal_document_acceptances';
 

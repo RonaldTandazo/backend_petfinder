@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterShelterRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Resources\Legal\LegalDocumentResource;
 use App\Services\Auth\AuthService;
 use App\Services\Legal\LegalDocumentAcceptanceService;
 use App\Services\Legal\LegalDocumentService;
@@ -42,7 +43,7 @@ class AuthController extends Controller
                 ];
             }
 
-            $this->legalDocumentAcceptanceService->store($legalAcceptances);
+            $this->legalDocumentAcceptanceService->acceptDocuments($legalAcceptances);
 
             return $this->sendResponse(
                 message : 'Usuario registrado exitosamente',
@@ -82,7 +83,7 @@ class AuthController extends Controller
                 ];
             }
 
-            $this->legalDocumentAcceptanceService->store($legalAcceptances);
+            $this->legalDocumentAcceptanceService->acceptDocuments($legalAcceptances);
 
             return $this->sendResponse(
                 message : 'Refugio registrado exitosamente',
@@ -108,6 +109,15 @@ class AuthController extends Controller
     {
         try {
             $result = $this->authService->login($request->validated());
+            $legalDocuments = $this->legalDocumentService->getCurrentVersions();
+
+            if($result['status'] == 'success'){
+                $tutorId = $result['payload']['session_info']['tutor_id'];
+                $pendingAcceptances = $this->legalDocumentAcceptanceService->getPendingAcceptances($legalDocuments, $tutorId);
+                
+                $result['payload']['requires_legal_acceptances'] = count($pendingAcceptances) > 0;
+                $result['payload']['legal_documents'] = LegalDocumentResource::collection($pendingAcceptances);
+            }
 
             return match ($result['status']) {
                 'invalid_credentials' => $this->sendError(
@@ -143,7 +153,6 @@ class AuthController extends Controller
     {
         try {
             $account = $request->user();
-
             if (!$account) {
                 return $this->sendError(
                     message : 'Token no válido o usuario no encontrado',
@@ -151,8 +160,20 @@ class AuthController extends Controller
                 );
             }
 
+            $sessionInfo = $this->authService->sessionInfo($account, $this->isUser());
+            $legalDocuments = $this->legalDocumentService->getCurrentVersions();
+
+            $tutorId = $sessionInfo['tutor_id'];
+            $pendingAcceptances = $this->legalDocumentAcceptanceService->getPendingAcceptances($legalDocuments, $tutorId);
+                
+            $result = [
+                'session_info'               => $sessionInfo,
+                'requires_legal_acceptances' => count($pendingAcceptances) > 0,
+                'legal_documents'            => LegalDocumentResource::collection($pendingAcceptances)
+            ];
+
             return $this->sendResponse(
-                data    : $this->authService->sessionInfo($account, $this->isUser()),
+                data    : $result,
                 message : 'Sesión verificada exitosamente'
             );
         } catch (CustomValidationException $e) {
