@@ -11,3 +11,4 @@ require __DIR__ . '/Picture/PictureRoutes.php';
 require __DIR__ . '/Community/CommunityRoutes.php';
 require __DIR__ . '/Account/AccountRoutes.php';
 require __DIR__ . '/Legal/LegalRoutes.php';
+require __DIR__ . '/Help/HelpRoutes.php';

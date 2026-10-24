@@ -103,5 +103,18 @@ class CatalogSeeder extends Seeder
             ['id' => 2, 'name' => 'Desparasitado', 'tag' => 'DEWORMED', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 3, 'name' => 'Esterilizado / Castrado', 'tag' => 'NEUTERED', 'created_at' => $now, 'updated_at' => $now],
         ]);
+
+        // Legal Document
+        DB::table('legal_documents')->insertOrIgnore([
+            ['id' => 1, 'name' => 'Términos y Condiciones', 'tag' => 'TERMS', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 2, 'name' => 'Política de Privacidad y Protección de Datos', 'tag' => 'PRIVACY', 'created_at' => $now, 'updated_at' => $now]
+        ]);
+
+        // Help Statuses
+        DB::table('help_statuses')->insertOrIgnore([
+            ['id' => 1, 'name' => 'Pendiente', 'tag' => 'PENDING', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 2, 'name' => 'En Proceso', 'tag' => 'IN_PROGRESS', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 3, 'name' => 'Terminado', 'tag' => 'COMPLETED', 'created_at' => $now, 'updated_at' => $now],
+        ]);
     }
 }
