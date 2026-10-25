@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Account;
 
 use App\Models\Catalog\Country;
-use App\Models\Catalog\Gender;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\Picture\Picture;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -12,34 +11,40 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class Shelter extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
-    protected $table = 'users';
+    protected $table = 'shelters';
 
     protected $fillable = [
-        'first_names',
-        'last_names',
-        'birth_date',
+        'name',
+        'business_name',
+        'tax_identification',
         'email',
         'password',
         'phone_mobile',
-        'country_id',
-        'gender_id',
-        'city',
         'address',
+        'country_id',
+        'city',
+        'latitude',
+        'longitude',
+        'web_page',
+        'business_hours',
+        'verified',
     ];
 
     protected $hidden = [
-        'password'
+        'password',
     ];
 
     protected function casts(): array
     {
         return [
-            'birth_date' => 'date',
             'password' => 'hashed',
+            'verified' => 'boolean',
+            'latitude' => 'double',
+            'longitude' => 'double',
         ];
     }
 
@@ -48,21 +53,9 @@ class User extends Authenticatable
         return $this->belongsTo(Country::class);
     }
 
-    public function gender(): BelongsTo
-    {
-        return $this->belongsTo(Gender::class);
-    }
-
     public function tutor(): HasOne
     {
         return $this->hasOne(Tutor::class);
-    }
-
-    protected function name(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => trim($this->first_names) . " ". trim($this->last_names)
-        );
     }
 
     public function avatar(): MorphOne

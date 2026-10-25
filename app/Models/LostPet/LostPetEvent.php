@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\LostPet;
 
+use App\Models\Account\Tutor;
 use App\Models\Catalog\LostPetEventType;
+use App\Models\Picture\Picture;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;

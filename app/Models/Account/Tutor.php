@@ -1,8 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Account;
 
+use App\Models\Adoption\Adoption;
 use App\Models\Catalog\TutorType;
+use App\Models\LostPet\LostPet;
+use App\Models\LostPet\LostPetEvent;
+use App\Models\Pet\Pet;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

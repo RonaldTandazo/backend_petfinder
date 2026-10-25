@@ -4,8 +4,8 @@ namespace App\Services\Picture;
 
 use App\Helpers\ValidationErrorHelper;
 use App\Jobs\SyncPictureJob;
-use App\Models\Pet;
-use App\Models\Picture;
+use App\Models\Pet\Pet;
+use App\Models\Picture\Picture;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Pet;
 
 use App\Models\Catalog\HealthCondition;
 use Illuminate\Database\Eloquent\Model;

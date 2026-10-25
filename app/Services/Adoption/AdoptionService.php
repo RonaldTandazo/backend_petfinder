@@ -3,8 +3,8 @@
 namespace App\Services\Adoption;
 
 use App\Jobs\SyncPictureJob;
-use App\Models\Pet;
-use App\Models\PetFollows;
+use App\Models\Pet\Pet;
+use App\Models\Pet\PetFollows;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ValidatedInput;

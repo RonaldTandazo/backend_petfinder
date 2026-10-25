@@ -2,7 +2,7 @@
 
 namespace App\Models\Legal;
 
-use App\Models\Tutor;
+use App\Models\Account\Tutor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

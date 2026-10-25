@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
-use App\Models\Shelter;
+use App\Models\Account\Shelter;
+use App\Models\Account\User;
 
 return [
 

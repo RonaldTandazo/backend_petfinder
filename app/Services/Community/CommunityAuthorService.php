@@ -2,7 +2,7 @@
 
 namespace App\Services\Community;
 
-use App\Models\Shelter;
+use App\Models\Account\Shelter;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 class CommunityAuthorService

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Picture;
+use App\Models\Picture\Picture;
 use App\Services\Storage\PictureSyncService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

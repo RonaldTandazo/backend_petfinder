@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\LostPet;
 
+use App\Models\Account\Tutor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

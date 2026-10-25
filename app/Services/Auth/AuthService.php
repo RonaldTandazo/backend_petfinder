@@ -3,10 +3,10 @@
 namespace App\Services\Auth;
 
 use App\Http\Resources\Auth\SessionInfoResource;
+use App\Models\Account\Shelter;
+use App\Models\Account\Tutor;
+use App\Models\Account\User;
 use App\Models\Catalog\TutorType;
-use App\Models\Shelter;
-use App\Models\Tutor;
-use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

@@ -3,11 +3,11 @@
 namespace App\Services\Account;
 
 use App\Helpers\ValidationErrorHelper;
-use App\Models\Adoption;
-use App\Models\LostPet;
-use App\Models\LostPetFollows;
-use App\Models\Pet;
-use App\Models\PetFollows;
+use App\Models\Adoption\Adoption;
+use App\Models\LostPet\LostPet;
+use App\Models\LostPet\LostPetFollows;
+use App\Models\Pet\Pet;
+use App\Models\Pet\PetFollows;
 use App\Services\Storage\PictureDeletionService;
 use App\Services\Storage\PictureSyncService;
 use Illuminate\Contracts\Auth\Authenticatable;

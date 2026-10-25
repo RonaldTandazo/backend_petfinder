@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Shelter;
-use App\Models\User;
+use App\Models\Account\Shelter;
+use App\Models\Account\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\JsonResponse; 
 use Symfony\Component\HttpFoundation\Response;

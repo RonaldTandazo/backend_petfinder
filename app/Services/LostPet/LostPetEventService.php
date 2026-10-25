@@ -2,7 +2,7 @@
 
 namespace App\Services\LostPet;
 
-use App\Models\LostPetEvent;
+use App\Models\LostPet\LostPetEvent;
 use App\Services\Storage\PictureDeletionService;
 use App\Services\Storage\PictureSyncService;
 use Illuminate\Database\Eloquent\Collection;

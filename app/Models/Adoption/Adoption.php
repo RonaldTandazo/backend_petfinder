@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Adoption;
 
+use App\Models\Account\Tutor;
 use App\Models\Catalog\AdoptionStatus;
+use App\Models\Pet\Pet;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

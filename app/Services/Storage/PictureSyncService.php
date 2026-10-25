@@ -2,7 +2,7 @@
 
 namespace App\Services\Storage;
 
-use App\Models\Picture;
+use App\Models\Picture\Picture;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

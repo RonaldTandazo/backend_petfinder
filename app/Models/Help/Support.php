@@ -2,9 +2,9 @@
 
 namespace App\Models\Help;
 
+use App\Models\Account\Tutor;
 use App\Models\Catalog\HelpStatus;
-use App\Models\Picture;
-use App\Models\Tutor;
+use App\Models\Picture\Picture;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;

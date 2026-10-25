@@ -2,8 +2,8 @@
 
 namespace App\Models\Catalog;
 
-use App\Models\LostPet;
-use App\Models\Pet;
+use App\Models\LostPet\LostPet;
+use App\Models\Pet\Pet;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 

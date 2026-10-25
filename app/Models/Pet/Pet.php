@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Pet;
 
+use App\Models\Account\Tutor;
+use App\Models\Adoption\Adoption;
 use App\Models\Catalog\AnimalGender;
 use App\Models\Catalog\PetStatus;
 use App\Models\Catalog\Size;
 use App\Models\Catalog\Species;
+use App\Models\Picture\Picture;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;

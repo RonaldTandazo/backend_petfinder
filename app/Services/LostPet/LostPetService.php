@@ -3,8 +3,8 @@
 namespace App\Services\LostPet;
 
 use App\Jobs\SyncPictureJob;
-use App\Models\LostPet;
-use App\Models\LostPetFollows;
+use App\Models\LostPet\LostPet;
+use App\Models\LostPet\LostPetFollows;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ValidatedInput;

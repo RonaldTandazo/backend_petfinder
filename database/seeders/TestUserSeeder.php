@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Shelter;
-use App\Models\Tutor;
-use App\Models\User;
+use App\Models\Account\Shelter;
+use App\Models\Account\Tutor;
+use App\Models\Account\User;
 use Illuminate\Database\Seeder;
 
 class TestUserSeeder extends Seeder

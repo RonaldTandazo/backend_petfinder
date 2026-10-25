@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\LostPet;
 
+use App\Models\Account\Tutor;
 use App\Models\Catalog\AnimalGender;
 use App\Models\Catalog\ReportStatus;
 use App\Models\Catalog\ReportType;
 use App\Models\Catalog\Size;
 use App\Models\Catalog\Species;
+use App\Models\Picture\Picture;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
