@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('account_deletions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
+            $table->foreignId('tutor_id')->nullable()->constrained('tutors')->nullOnDelete();
             $table->timestamp('requested_at');
             $table->timestamp('schedule_deletion_at');
             $table->foreignId('deletion_status_id')->default(1)->constrained('deletion_statuses')->cascadeOnDelete();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
+
+            $table->index(['status', 'scheduled_deletion_at']);
         });
     }
 

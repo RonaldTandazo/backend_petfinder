@@ -23,7 +23,7 @@ class LostPetListResource extends JsonResource
             'event_date'        => $this->event_date->toIso8601String(),
             'report_status_tag' => $this->whenLoaded('reportStatus', fn () => $this->reportStatus->tag),
             'report_status'     => $this->whenLoaded('reportStatus', fn () => $this->reportStatus->name),
-            'picture'           => config('services.pictures.host') . $this->mainPicture->path
+            'picture'           => $this->mainPicture ? config('services.pictures.host') . $this->mainPicture->path : null
         ];
     }
 }

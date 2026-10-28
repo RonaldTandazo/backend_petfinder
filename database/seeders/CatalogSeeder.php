@@ -114,7 +114,7 @@ class CatalogSeeder extends Seeder
         DB::table('help_statuses')->insertOrIgnore([
             ['id' => 1, 'name' => 'Pendiente', 'tag' => 'PENDING', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 2, 'name' => 'En Proceso', 'tag' => 'IN_PROGRESS', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 3, 'name' => 'Terminado', 'tag' => 'COMPLETED', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 3, 'name' => 'Realizado', 'tag' => 'DONE', 'created_at' => $now, 'updated_at' => $now],
         ]);
 
         // Deletion Statuses
@@ -122,7 +122,7 @@ class CatalogSeeder extends Seeder
             ['id' => 1, 'name' => 'Pendiente', 'tag' => 'PENDING', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 2, 'name' => 'En Proceso', 'tag' => 'IN_PROGRESS', 'created_at' => $now, 'updated_at' => $now],
             ['id' => 3, 'name' => 'Cancelado', 'tag' => 'CANCELLED', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 4, 'name' => 'Terminado', 'tag' => 'COMPLETED', 'created_at' => $now, 'updated_at' => $now],
+            ['id' => 4, 'name' => 'Completo', 'tag' => 'COMPLETED', 'created_at' => $now, 'updated_at' => $now],
         ]);
     }
 }

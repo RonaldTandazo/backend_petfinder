@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Management;
 
 use App\Models\Account\Tutor;
 use App\Models\Catalog\DeletionStatus;
