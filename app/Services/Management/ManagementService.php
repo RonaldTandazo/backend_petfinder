@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 class ManagementService
 {
     private const PENDING_STATUS_ID = 1;
+    private const IN_PROGRESS_STATUS_ID = 2;
 
-    public function existsPendingDeletion(int $tutorId): bool{
-        $pendingDeletion = AccountDeletion::query()
-            ->where('tutor_id', $tutorId)
-            ->where('deletion_status_id', self::PENDING_STATUS_ID)
+    public function existsAccountDeletion(int $tutorId): bool{
+        $pendingDeletion = AccountDeletion::where('tutor_id', $tutorId)
+            ->whereIn('deletion_status_id', [self::PENDING_STATUS_ID, self::IN_PROGRESS_STATUS_ID])
             ->exists();
 
         return $pendingDeletion;
@@ -34,5 +34,14 @@ class ManagementService
 
             return $deletion;
         });
+    }
+
+    public function cancelAccountDeletion(int $tutorId): void{
+        AccountDeletion::where('tutor_id', $tutorId)
+            ->whereIn('deletion_status_id', [self::PENDING_STATUS_ID])
+            ->update([
+                'deletion_status_id' => 3,
+                'cancelled_at' => now(),
+            ]);
     }
 }

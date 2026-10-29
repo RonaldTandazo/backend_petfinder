@@ -11,7 +11,7 @@ class SessionInfoResource extends JsonResource
     {
         return [
             'main_id'  => $this->id,
-            'tutor_id' => $this->whenLoaded('tutor', fn () => $this->tutor->id),
+            'tutor_id' => $this->tutor?->id,
             'name'     => $this->name,
             'email'    => $this->email,
             'avatar'   => $this->avatar ? [

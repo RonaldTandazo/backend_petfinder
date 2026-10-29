@@ -7,12 +7,15 @@ use App\Models\Account\Shelter;
 use App\Models\Account\Tutor;
 use App\Models\Account\User;
 use App\Models\Catalog\TutorType;
+use App\Services\Management\ManagementService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+    public function __construct(protected ManagementService $managementService) {}
+
     public function registerUser(array $validated): User
     {
         return DB::transaction(function () use ($validated) {
@@ -56,6 +59,9 @@ class AuthService
         $email        = $credentials['email'];
         $password     = $credentials['password'];
         $selectedType = $credentials['account_type'] ?? null;
+        
+        $isAccountDeletionActive = $credentials['is_account_deletion_active'] ?? false;
+        $cancelAccountDeletion = $credentials['cancel_account_deletion'] ?? false;
 
         $accounts = $this->findAccountsByEmail($email);
         $user     = $accounts['user'];
@@ -67,9 +73,22 @@ class AuthService
 
         if ($selectedType) {
             $targetAccount = $selectedType === 'user' ? $user : $shelter;
-
             if (!$targetAccount || !Hash::check($password, $targetAccount->password)) {
                 return ['status' => 'invalid_credentials', 'payload' => null];
+            }
+
+            if($isAccountDeletionActive && $cancelAccountDeletion){
+                $this->cancelAccountDeletion($targetAccount);
+            }
+
+            $existsDeletion = $this->validateAccountDeletion($targetAccount);
+            if($existsDeletion){
+                return [
+                    'status'  => 'account_deletion',
+                    'payload' => [
+                        'exists_account_deletion' => true
+                    ]
+                ];
             }
 
             return [
@@ -98,13 +117,27 @@ class AuthService
         $activeAccount = $userValid ? $user : $shelter;
         $type          = $userValid ? 'user' : 'shelter';
 
+        if($isAccountDeletionActive && $cancelAccountDeletion){
+            $this->cancelAccountDeletion($activeAccount);
+        }
+
+        $existsDeletion = $this->validateAccountDeletion($activeAccount);
+        if($existsDeletion){
+            return [
+                'status'  => 'account_deletion',
+                'payload' => [
+                    'exists_account_deletion' => true
+                ]
+            ];
+        }
+
         return [
             'status'  => 'success',
             'payload' => $this->generateAuthPayload($activeAccount, $type),
         ];
     }
 
-    public function findAccountsByEmail(string $email): array
+    private function findAccountsByEmail(string $email): array
     {
         return [
             'user'    => User::where('email', $email)->first(),
@@ -112,7 +145,7 @@ class AuthService
         ];
     }
 
-    public function generateAuthPayload($account, string $type): array
+    private function generateAuthPayload($account, string $type): array
     {
         $account->tokens()->delete();
 
@@ -130,12 +163,24 @@ class AuthService
 
     public function sessionInfo(Authenticatable $account, bool $isUser): array
     {
-        $account->load(['tutor']);
-
         return SessionInfoResource::make($account)->toArray(request()) + [
             'is_shelter' => !$isUser,
             'is_user'    => $isUser,
         ];
+    }
+
+    private function validateAccountDeletion(Authenticatable $account): bool
+    {
+        $tutorId = $account->tutor?->id;
+
+        return $this->managementService->existsAccountDeletion($tutorId);
+    }
+
+    private function cancelAccountDeletion(Authenticatable $account): void
+    {
+        $tutorId = $account->tutor?->id;
+
+        $this->managementService->cancelAccountDeletion($tutorId);
     }
 
     public function logout(Authenticatable $account): void

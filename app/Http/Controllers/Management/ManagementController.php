@@ -18,7 +18,7 @@ class ManagementController extends Controller
         try {
             $tutorId = $this->getTutorId();
 
-            $existsDeletion = $this->managementService->existsPendingDeletion($tutorId);
+            $existsDeletion = $this->managementService->existsAccountDeletion($tutorId);
             if($existsDeletion){
                 throw new CustomValidationException(
                     'Ya existe una solicitud de eliminación pendiente'
@@ -27,8 +27,10 @@ class ManagementController extends Controller
 
             $deletion = $this->managementService->deleteAccount($tutorId);
 
+            $deletionDate = ucfirst($deletion->schedule_deletion_at->locale('es')->translatedFormat('d-F-Y'));
+
             return $this->sendResponse(
-                message: 'Tu cuenta tiene programada su eliminación para el ' . $deletion->schedule_deletion_at->format('d/m/Y'),
+                message: 'Tu cuenta tiene programada su eliminación el ' . $deletionDate,
             );
         } catch (CustomValidationException $e) {
             return $this->sendError(

@@ -126,7 +126,11 @@ class AuthController extends Controller
                 ),
                 'select_account' => $this->sendResponse(
                     data    : $result['payload'],
-                    message : 'Seleccione con qué tipo de cuenta desea ingresar'
+                    message : 'Selecciona con qué tipo de cuenta deseas ingresar'
+                ),
+                'account_deletion' => $this->sendResponse(
+                    data    : $result['payload'],
+                    message : "Tienes una solicitud activa para eliminar la cuenta. \n\n¿Deseas cancelarla?"
                 ),
                 'success' => $this->sendResponse(
                     data    : $result['payload'],
