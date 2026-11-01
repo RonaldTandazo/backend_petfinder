@@ -15,9 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('legal_document_id')->constrained('legal_documents')->cascadeOnDelete();
             $table->string('version', 50);
-            $table->text('path')->nullable();
+            $table->text('md_path')->nullable();
+            $table->text('pdf_path')->nullable();
             $table->timestamp('published_at');
             $table->timestamps();
+
+            $table->unique(
+                ['legal_document_id', 'version'],
+                'legal_document_version_unique'
+            );
         });
     }
 

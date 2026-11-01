@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Storage;
 
 class PurgeS3ObjectService
 {
+    private const DISK = 's3';
+
     public function purgeAllVersions(string $key): void
     {
-        $client = Storage::disk('s3')->getClient();
+        $client = Storage::disk(self::DISK)->getClient();
         $bucket = config('filesystems.disks.s3.bucket');
 
         $versions = $client->listObjectVersions([

@@ -9,7 +9,13 @@ class Picture extends Model
 {
     protected $table = 'pictures';
 
-    protected $fillable = ['path', 'path_temp', 'is_main', 'synced', 'uploaded_by_id'];
+    protected $fillable = [
+        'path',
+        'path_temp',
+        'is_main',
+        'synced',
+        'uploaded_by_id'
+    ];
 
     protected function casts(): array
     {

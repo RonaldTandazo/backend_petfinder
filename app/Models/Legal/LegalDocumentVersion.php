@@ -12,7 +12,8 @@ class LegalDocumentVersion extends Model
     protected $fillable = [
         'legal_document_id',
         'version',
-        'path',
+        'md_path',
+        'pdf_path',
         'published_at',
     ];
 

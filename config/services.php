@@ -39,7 +39,15 @@ return [
         'webhook_token' => env('MINIO_WEBHOOK_TOKEN'),
     ],
 
+    'resend' => [
+        'key' => env('RESEND_API_KEY'),
+    ],
+
     'pictures' => [
         'host' => $picturesHost,
     ],
+
+    'help' => [
+        'email' => 'edu09085@hotmail.com'
+    ]
 ];

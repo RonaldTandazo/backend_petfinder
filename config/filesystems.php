@@ -74,6 +74,19 @@ return [
             'throw'                   => true,
             'report'                  => false,
         ],
+
+        's3_docs' => [
+            'driver'                  => 's3',
+            'key'                     => $isProduction ? env('AWS_ACCESS_KEY_ID') : env('AWS_ACCESS_KEY_ID_LOCAL'),
+            'secret'                  => $isProduction ? env('AWS_SECRET_ACCESS_KEY') : env('AWS_SECRET_ACCESS_KEY_LOCAL'),
+            'region'                  => $isProduction ? env('AWS_REGION') : env('AWS_DEFAULT_REGION_LOCAL'),
+            'bucket'                  => $isProduction ? env('AWS_BUCKET_DOCS') : env('AWS_BUCKET_DOCS_LOCAL'),
+            'url'                     => $isProduction ? env('AWS_URL') : env('AWS_URL_LOCAL'),
+            'endpoint'                => $isProduction ? env('AWS_ENDPOINT') : env('AWS_ENDPOINT_LOCAL'),
+            'use_path_style_endpoint' => $isProduction ? env('AWS_USE_PATH_STYLE_ENDPOINT', true) : env('AWS_USE_PATH_STYLE_ENDPOINT_LOCAL', true),
+            'throw'                   => true,
+            'report'                  => false,
+        ],
     ],
 
     /*

@@ -16,7 +16,7 @@ class SessionInfoResource extends JsonResource
             'email'    => $this->email,
             'avatar'   => $this->avatar ? [
                 'id'      => $this->avatar->id,
-                'url'     => config('services.pictures.host') . $this->avatar->path,
+                'url'     => $this->avatar->path ? config('services.pictures.host') . $this->avatar->path : null,
                 'is_main' => $this->avatar->is_main,
             ] : null
         ];

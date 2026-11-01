@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 
 class PictureDeletionService
 {
+    private const DISK = 's3_temp';
+
     public function __construct(protected PurgeS3ObjectService $purgeS3ObjectService) {}
 
     public function delete(Picture $picture): void
@@ -16,7 +18,7 @@ class PictureDeletionService
         }
 
         if ($picture->path_temp) {
-            Storage::disk('s3_temp')->delete($picture->path_temp);
+            Storage::disk(self::DISK)->delete($picture->path_temp);
         }
 
         $picture->update([

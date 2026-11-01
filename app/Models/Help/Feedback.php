@@ -27,8 +27,7 @@ class Feedback extends Model
 
     public function pictures(): MorphMany
     {
-        return $this->morphMany(Picture::class, 'pictureable')
-            ->orderByDesc('is_main');
+        return $this->morphMany(Picture::class, 'pictureable')->orderByDesc('is_main');
     }
 
     public function helpStatus(): BelongsTo

@@ -14,7 +14,6 @@ class LegalDocumentResource  extends JsonResource
             'name'         => $this['name'],
             'tag'          => $this['tag'],
             'version'      => $this['version'],
-            'path'         => $this['path'],
             'published_at' => $this['published_at'],
         ];
     }

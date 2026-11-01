@@ -2,15 +2,14 @@
 
 namespace App\Services\Help;
 
-use App\Jobs\SyncPictureJob;
 use App\Models\Help\Feedback;
-use App\Services\Storage\PictureDeletionService;
+use App\Services\Storage\PictureSyncService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ValidatedInput;
 
 class FeedbackService
 {
-    public function __construct(protected PictureDeletionService $pictureDeletionService) {}
+    public function __construct(protected PictureSyncService $pictureSyncService) {}
 
     public function create(ValidatedInput $validated, int $tutorId): Feedback
     {
@@ -33,7 +32,7 @@ class FeedbackService
 
                 $pictures = $feedback->pictures()->createMany($photosToInsert);
 
-                SyncPictureJob::dispatch($pictures)->afterCommit();
+                $this->pictureSyncService->syncMany($pictures);
             }
 
             return $feedback;

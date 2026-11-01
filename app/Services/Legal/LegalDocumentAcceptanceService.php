@@ -36,7 +36,6 @@ class LegalDocumentAcceptanceService
                     'name'         => $detail['document'],
                     'tag'          => $tag,
                     'version'      => $detail['version'],
-                    'path'         => $detail['path'],
                     'published_at' => $detail['published_at']
                 ];
             }

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
 
-            $table->index(['status', 'scheduled_deletion_at']);
+            $table->index(['deletion_status_id', 'schedule_deletion_at']);
         });
     }
 

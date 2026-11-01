@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Help;
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Help\FormFeedbackRequest;
+use App\Http\Resources\Help\HelpResource;
+use App\Mail\HelpMail;
 use App\Services\Help\FeedbackService;
+use App\Services\Mail\MailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,12 +16,30 @@ use Throwable;
 
 class FeedbackController extends Controller
 {
-    public function __construct(protected FeedbackService $feedbackService) {}
+    public function __construct(
+        protected FeedbackService $feedbackService,
+        protected MailService $mailService
+    ) {}
 
     public function store(FormFeedbackRequest $request): JsonResponse
     {
         try {
             $feedback = $this->feedbackService->create($request->safe(), $this->getTutorId());
+
+            try {
+                $this->mailService->queue(
+                    config('services.help.email'),
+                    new HelpMail(
+                        (new HelpResource($feedback))->resolve(),
+                        'feedback'
+                    )
+                );
+            } catch (Throwable $th) {
+                Log::error('Error encolando correo de feedback', [
+                    'feedback_id' => $feedback->id,
+                    'exception' => $th,
+                ]);
+            }
 
             return $this->sendResponse(
                 data    : ['feedback_id' => $feedback->id],

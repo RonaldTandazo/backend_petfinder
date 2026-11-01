@@ -16,6 +16,7 @@ class TestUserSeeder extends Seeder
             [
                 'first_names' => 'Test',
                 'last_names'  => 'User',
+                'birth_date'  => '2001-08-09',
                 'password'    => '12345678',
             ]
         );

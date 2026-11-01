@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 
 class PictureSyncService
 {
+    private const DISK = 's3_temp';
+    
     public function __construct(protected MediaSyncService $mediaSyncService) {}
 
     public function syncMany(Collection $pictures): void
@@ -23,7 +25,7 @@ class PictureSyncService
             return;
         }
 
-        $tempDisk = Storage::disk('s3_temp');
+        $tempDisk = Storage::disk(self::DISK);
 
         $cleanTempKey = basename(parse_url($picture->path_temp, PHP_URL_PATH));
         
@@ -32,13 +34,13 @@ class PictureSyncService
         $targetKey = $picture->path ?? $this->buildKey($picture);
 
         $this->mediaSyncService->copyToPermanentBucket($picture->path_temp, $targetKey, [
-            'id_picture'       => (string) $picture->id,
-            'id_pictureable'   => (string) $picture->pictureable_id,
+            'picture_id'       => (string) $picture->id,
+            'pictureable_id'   => (string) $picture->pictureable_id,
             'pictureable_type' => class_basename($picture->pictureable_type),
-            'id_usuario'       => (string) ($picture->uploaded_by_id ?? ''),
+            'tutor_id'       => (string) ($picture->uploaded_by_id ?? ''),
         ]);
 
-        Storage::disk('s3_temp')->delete($cleanTempKey);
+        Storage::disk(self::DISK)->delete($cleanTempKey);
 
         $picture->update([
             'path'   => $targetKey,

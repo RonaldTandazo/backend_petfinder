@@ -25,11 +25,12 @@ class LegalDocumentService
 
                         return [
                             $document->tag => [
-                                'document' => $document->name,
                                 'document_id' => $document->id,
+                                'document' => $document->name,
                                 'version_id' => $version?->id,
                                 'version' => $version?->version,
-                                'path' => $version?->path,
+                                'md_path' => $version?->md_path,
+                                'pdf_path' => $version?->pdf_path,
                                 'published_at' => $version?->published_at->toIso8601String(),
                             ],
                         ];

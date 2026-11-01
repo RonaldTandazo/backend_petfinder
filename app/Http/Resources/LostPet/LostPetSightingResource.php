@@ -20,10 +20,10 @@ class LostPetSightingResource extends JsonResource
             'pictures'      => $this->pictures->map(
                 fn ($picture) => [
                     'id'      => $picture->id,
-                    'url'     => config('services.pictures.host') . $picture->path,
+                    'url'     => $picture->path ? config('services.pictures.host') . $picture->path : null,
                     'is_main' => $picture->is_main,
                 ]
-            )
+            )->values()->all()
         ];
     }
 }
