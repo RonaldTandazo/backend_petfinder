@@ -13,3 +13,4 @@ require __DIR__ . '/Account/AccountRoutes.php';
 require __DIR__ . '/Legal/LegalRoutes.php';
 require __DIR__ . '/Help/HelpRoutes.php';
 require __DIR__ . '/Management/ManagementRoutes.php';
+require __DIR__ . '/Password/PasswordApiRoutes.php';

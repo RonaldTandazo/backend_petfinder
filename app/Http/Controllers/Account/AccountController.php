@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Account;
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ProfileRequest;
-use App\Http\Requests\Account\UpdatePasswordRequest;
+use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\UpdateProfileRequest;
 use App\Http\Resources\Adoption\AdoptionPetListResource;
 use App\Http\Resources\LostPet\LostPetListResource;
@@ -126,10 +126,10 @@ class AccountController extends Controller
         }
     }
 
-    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         try {
-            $this->accountService->updatePassword($request->user(), $request->safe());
+            $this->accountService->changePassword($request->user(), $request->safe());
 
             return $this->sendResponse(
                 message : 'Contraseña actualizada exitosamente'

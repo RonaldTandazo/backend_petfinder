@@ -109,7 +109,6 @@ class AuthService
                 'status'  => 'select_account',
                 'payload' => [
                     'requires_account_selection' => true,
-                    'available_accounts'         => ['user', 'shelter'],
                 ],
             ];
         }

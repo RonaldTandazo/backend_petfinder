@@ -6,7 +6,7 @@ use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Help\FormFeedbackRequest;
 use App\Http\Resources\Help\HelpResource;
-use App\Mail\HelpMail;
+use App\Mail\Help\HelpMail;
 use App\Services\Help\FeedbackService;
 use App\Services\Mail\MailService;
 use Illuminate\Http\JsonResponse;

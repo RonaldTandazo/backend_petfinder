@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class LoginRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class LoginRequest extends FormRequest
         return [
             'email'                      => ['required', 'string', 'email'],
             'password'                   => ['required', 'string'],
-            'account_type'               => ['nullable', 'string', 'max:10'],
+            'account_type'               => ['nullable', 'string', Rule::in(['user', 'shelter'])],
             'is_account_deletion_active' => ['nullable', 'boolean'],
             'cancel_account_deletion'    => ['nullable', 'boolean'],
         ];
@@ -36,6 +37,7 @@ class LoginRequest extends FormRequest
             'email.required'    => 'El correo electrónico es obligatorio',
             'email.email'       => 'Debe ingresar un correo electrónico válido',
             'password.required' => 'La contraseña es obligatoria',
+            'account_type.in'   => 'El tipo de cuenta seleccionado no es válido',
         ];
     }
 }

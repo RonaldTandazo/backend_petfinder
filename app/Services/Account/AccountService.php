@@ -125,7 +125,7 @@ class AccountService
         });
     }
 
-    public function updatePassword(Authenticatable $account, ValidatedInput $validated): void
+    public function changePassword(Authenticatable $account, ValidatedInput $validated): void
     {
         if (!Hash::check($validated['current_password'], $account->password)) {
             ValidationErrorHelper::throwValidationError([

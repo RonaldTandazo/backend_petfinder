@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Help;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -27,7 +27,7 @@ class HelpMail extends Mailable
     public function content(): Content
     {   
         return new Content(
-            view: 'emails.help.created',
+            view: 'emails.help.request',
             with: [
                 'data' => $this->data,
                 'type' => $this->type,
