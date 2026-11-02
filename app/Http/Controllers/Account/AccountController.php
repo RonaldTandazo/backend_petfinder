@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Account;
 
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Account\ProfileRequest;
 use App\Http\Requests\Account\ChangePasswordRequest;
+use App\Http\Requests\Account\ProfileRequest;
 use App\Http\Requests\Account\UpdateProfileRequest;
+use App\Http\Resources\Account\ShelterResource;
+use App\Http\Resources\Account\UserResource;
 use App\Http\Resources\Adoption\AdoptionPetListResource;
 use App\Http\Resources\LostPet\LostPetListResource;
-use App\Http\Resources\ShelterResource;
-use App\Http\Resources\UserResource;
 use App\Services\Account\AccountService;
 use App\Services\Adoption\AdoptionService;
 use App\Services\LostPet\LostPetService;
