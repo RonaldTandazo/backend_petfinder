@@ -9,5 +9,4 @@ Route::middleware('auth:sanctum')->prefix('lost-pets')->group(function () {
     Route::post('store', [LostPetController::class, 'store']);
     Route::put('update/{lostPetId}', [LostPetController::class, 'update']);
     Route::delete('delete/{lostPetId}', [LostPetController::class, 'delete']);
-    Route::post('follow/{lostPetId}', [LostPetController::class, 'handleFollow']);
 });

@@ -8,6 +8,7 @@ use App\Models\Catalog\ReportStatus;
 use App\Models\Catalog\ReportType;
 use App\Models\Catalog\Size;
 use App\Models\Catalog\Species;
+use App\Models\Follow\PetFollows;
 use App\Models\Picture\Picture;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -88,6 +89,11 @@ class LostPet extends Model
     {
         return $this->morphMany(Picture::class, 'pictureable')
             ->orderByDesc('is_main');
+    }
+
+    public function follows(): MorphMany
+    {
+        return $this->morphMany(PetFollows::class, 'pet');
     }
 
     public function events(): HasMany

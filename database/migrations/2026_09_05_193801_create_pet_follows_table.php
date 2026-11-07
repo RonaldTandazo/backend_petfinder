@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('pet_follows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pet_id')->constrained('pets')->cascadeOnDelete();
+            $table->morphs('pet');
             $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
             $table->timestamps();
+            $table->unique(['tutor_id', 'pet_type', 'pet_id']);
         });
     }
 

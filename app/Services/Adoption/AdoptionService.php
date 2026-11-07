@@ -4,8 +4,8 @@ namespace App\Services\Adoption;
 
 use App\Jobs\SyncPictureJob;
 use App\Models\Pet\Pet;
-use App\Models\Pet\PetFollows;
 use App\Services\Storage\PictureDeletionService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ValidatedInput;
 
@@ -66,6 +66,16 @@ class AdoptionService
             ->firstOrFail();
 
         return $pet;
+    }
+
+    public function getAdoptionPetsByIds(array $petIds): Collection
+    {
+        $pets = Pet::with(['species', 'animalGender', 'size', 'healthConditions'])
+            ->whereIn('id', $petIds)
+            ->where('pet_status_id', 1)
+            ->get();
+
+        return $pets;
     }
 
     public function create(ValidatedInput $validated, int $tutorId): Pet
@@ -190,26 +200,5 @@ class AdoptionService
 
             $pet->delete();
         });
-    }
-
-    public function getAdoptionPetFollowState(int $petId, int $tutorId): bool
-    {        
-        return PetFollows::where('pet_id', $petId)
-            ->where('tutor_id', $tutorId)
-            ->exists();
-    }
-
-    public function handleFollow(int $petId, int $tutorId, bool $followStatus): void
-    {
-        if ($followStatus) {
-            PetFollows::create([
-                'pet_id'   => $petId,
-                'tutor_id' => $tutorId,
-            ]);
-        } else {
-            PetFollows::where('pet_id', $petId)
-                ->where('tutor_id', $tutorId)
-                ->delete();
-        }
     }
 }

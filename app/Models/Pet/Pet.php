@@ -8,6 +8,7 @@ use App\Models\Catalog\AnimalGender;
 use App\Models\Catalog\PetStatus;
 use App\Models\Catalog\Size;
 use App\Models\Catalog\Species;
+use App\Models\Follow\PetFollows;
 use App\Models\Picture\Picture;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -85,6 +86,11 @@ class Pet extends Model
     {
         return $this->morphMany(Picture::class, 'pictureable')
             ->orderByDesc('is_main');
+    }
+
+    public function follows(): MorphMany
+    {
+        return $this->morphMany(PetFollows::class, 'pet');
     }
 
     public function adoptions(): HasMany

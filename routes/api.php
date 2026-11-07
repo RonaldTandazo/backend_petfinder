@@ -14,3 +14,4 @@ require __DIR__ . '/Legal/LegalRoutes.php';
 require __DIR__ . '/Help/HelpRoutes.php';
 require __DIR__ . '/Management/ManagementRoutes.php';
 require __DIR__ . '/Password/PasswordApiRoutes.php';
+require __DIR__ . '/Follow/FollowRoutes.php';

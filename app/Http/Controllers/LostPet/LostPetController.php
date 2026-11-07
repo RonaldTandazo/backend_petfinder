@@ -4,12 +4,12 @@ namespace App\Http\Controllers\LostPet;
 
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Follow\FollowRequest;
 use App\Http\Requests\LostPet\FormLostPetRequest;
 use App\Http\Requests\LostPet\LostPetsReportsRequest;
 use App\Http\Resources\LostPet\LostPetListResource;
 use App\Http\Resources\LostPet\LostPetResource;
 use App\Http\Resources\LostPet\LostPetSightingResource;
+use App\Services\Follow\FollowService;
 use App\Services\LostPet\LostPetEventService;
 use App\Services\LostPet\LostPetService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,7 +20,11 @@ use Throwable;
 
 class LostPetController extends Controller
 {
-    public function __construct(protected LostPetService $lostPetService, protected LostPetEventService $lostPetEventService) {}
+    public function __construct(
+        protected FollowService $followService,
+        protected LostPetService $lostPetService,
+        protected LostPetEventService $lostPetEventService
+    ) {}
 
     public function getLostPets(LostPetsReportsRequest $request): JsonResponse
     {
@@ -61,7 +65,7 @@ class LostPetController extends Controller
         try {
             $lostPet = $this->lostPetService->getLostPetById($lostPetId);
             $sightings = $this->lostPetEventService->getLostPetSightingsByLostPetId($lostPetId);
-            $isFollowing = $this->lostPetService->getLostPetFollowState($lostPetId, $this->getTutorId());
+            $isFollowing = $this->followService->getPetFollow($lostPetId, $this->getTutorId(), 'lost_pet');
 
             $data = [
                 'lost_pet'     => LostPetResource::make($lostPet),
@@ -178,38 +182,6 @@ class LostPetController extends Controller
 
             return $this->sendError(
                 message : 'No se pudo eliminar reporte de mascota perdida',
-                error   : $th->getMessage()
-            );
-        }
-    }
-
-    public function handleFollow(int $lostPetId, FollowRequest $request): JsonResponse
-    {
-        try {
-            $tutorId = $this->getTutorId();
-            $followStatus = $request->boolean('is_following');
-
-            $this->lostPetService->handleFollow($lostPetId, $tutorId, $followStatus);
-
-            return $this->sendResponse(
-                message: 'Estado de seguimiento actualizado exitosamente'
-            );
-        } catch (ModelNotFoundException $e) {
-            return $this->sendError(
-                message : 'Reporte de Mascota Perdida no encontrado',
-                code    : Response::HTTP_NOT_FOUND
-            );
-        } catch (CustomValidationException $e) {
-            return $this->sendError(
-                message : $e->getMessage(),
-                error   : $e->errors(),
-                code    : $e->getCode()
-            );
-        } catch (Throwable $th) {
-            Log::error('Error actualizando estado de seguimiento: ' . $th->getMessage(), ['exception' => $th]);
-
-            return $this->sendError(
-                message : 'No se pudo actualizar el estado de seguimiento',
                 error   : $th->getMessage()
             );
         }

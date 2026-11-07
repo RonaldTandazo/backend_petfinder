@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Follow;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class FollowRequest extends FormRequest
 {
@@ -14,15 +15,22 @@ class FollowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'is_following'  => ['required', 'boolean'],
+            'category' => ['required', 'string', Rule::in(['all', 'adoption', 'lost_pet'])],
+            'page'     => ['nullable', 'integer', 'min:1'],
+            'limit'    => ['nullable', 'integer', 'min:1', 'max:50'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'is_following.required' => 'El estado de seguimiento es obligatorio',
-            'is_following.boolean' => 'El estado de seguimiento debe ser un valor booleano',
+            'category.required' => 'La categoría es obligatorio',
+            'category.in'       => 'La categoría no es válida',
+            'page.integer'      => 'El número de página debe ser un valor entero',
+            'page.min'          => 'La página debe ser al menos 1',
+            'limit.integer'     => 'El límite debe ser un valor entero',
+            'limit.min'         => 'El límite mínimo permitido es 1',
+            'limit.max'         => 'El límite máximo permitido es 50',
         ];
     }
 }

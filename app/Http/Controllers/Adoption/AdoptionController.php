@@ -6,10 +6,10 @@ use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Adoption\AdoptionPetsRequest;
 use App\Http\Requests\Adoption\FormAdoptionPetRequest;
-use App\Http\Requests\Follow\FollowRequest;
 use App\Http\Resources\Adoption\AdoptionPetListResource;
 use App\Http\Resources\Adoption\AdoptionPetResource;
 use App\Services\Adoption\AdoptionService;
+use App\Services\Follow\FollowService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +18,10 @@ use Throwable;
 
 class AdoptionController extends Controller
 {
-    public function __construct(protected AdoptionService $adoptionService) {}
+    public function __construct(
+        protected FollowService $followService,
+        protected AdoptionService $adoptionService
+    ) {}
 
     public function getAdoptionPets(AdoptionPetsRequest $request): JsonResponse
     {
@@ -58,7 +61,7 @@ class AdoptionController extends Controller
     public function getAdoptionPet(int $petId): JsonResponse{
         try {
             $pet = $this->adoptionService->getAdoptionPetById($petId);
-            $isFollowing = $this->adoptionService->getAdoptionPetFollowState($petId, $this->getTutorId());
+            $isFollowing = $this->followService->getPetFollow($petId, $this->getTutorId(), 'adoption');
 
             $data = [
                 'pet'          => AdoptionPetResource::make($pet),
@@ -174,38 +177,6 @@ class AdoptionController extends Controller
 
             return $this->sendError(
                 message : 'No se pudo eliminar mascota',
-                error   : $th->getMessage()
-            );
-        }
-    }
-
-    public function handleFollow(int $petId, FollowRequest $request): JsonResponse
-    {
-        try {
-            $tutorId = $this->getTutorId();
-            $followStatus = $request->boolean('is_following');
-
-            $this->adoptionService->handleFollow($petId, $tutorId, $followStatus);
-
-            return $this->sendResponse(
-                message: 'Estado de seguimiento actualizado exitosamente'
-            );
-        } catch (ModelNotFoundException $e) {
-            return $this->sendError(
-                message : 'Mascota no encontrada',
-                code    : Response::HTTP_NOT_FOUND
-            );
-        } catch (CustomValidationException $e) {
-            return $this->sendError(
-                message : $e->getMessage(),
-                error   : $e->errors(),
-                code    : $e->getCode()
-            );
-        } catch (Throwable $th) {
-            Log::error('Error actualizando estado de seguimiento: ' . $th->getMessage(), ['exception' => $th]);
-
-            return $this->sendError(
-                message : 'No se pudo actualizar el estado de seguimiento',
                 error   : $th->getMessage()
             );
         }

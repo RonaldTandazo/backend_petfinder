@@ -5,9 +5,8 @@ namespace App\Services\Account;
 use App\Helpers\ValidationErrorHelper;
 use App\Models\Adoption\Adoption;
 use App\Models\LostPet\LostPet;
-use App\Models\LostPet\LostPetFollows;
 use App\Models\Pet\Pet;
-use App\Models\Pet\PetFollows;
+use App\Models\Follow\PetFollows;
 use App\Services\Storage\PictureDeletionService;
 use App\Services\Storage\PictureSyncService;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -25,8 +24,8 @@ class AccountService
     public function getProfileMetrics(int $tutorId): array
     {
         $postsCount     = Pet::where('tutor_id', $tutorId)->count() + LostPet::where('tutor_id', $tutorId)->count();
-        $adoptionsCount = Adoption::where('tutor_id', $tutorId)->where('adoption_status_id', 3)->count();
-        $followsCount   = PetFollows::where('tutor_id', $tutorId)->count() + LostPetFollows::where('tutor_id', $tutorId)->count();
+        // $adoptionsCount = Adoption::where('tutor_id', $tutorId)->where('adoption_status_id', 3)->count();
+        $followsCount   = PetFollows::where('tutor_id', $tutorId)->count();
         
         return [
             [
@@ -34,16 +33,16 @@ class AccountService
                 'tag'    => 'POSTINGS',
                 'count'  => $postsCount
             ],
-            [
-                'label'  => 'Adopciones',
-                'tag'    => 'ADOPTIONS',
-                'count'  => $adoptionsCount
-            ],
+            // [
+            //     'label'  => 'Adopciones',
+            //     'tag'    => 'ADOPTIONS',
+            //     'count'  => $adoptionsCount
+            // ],
             [
                 'label'  => 'Favoritos',
                 'tag'    => 'FAVOURITES',
                 'count'  => $followsCount,
-                'action' => 'open_followed'
+                'action' => 'open'
             ]
         ];
     }
