@@ -16,7 +16,7 @@ class FollowService
 
     private const PET_TYPES_LABEL = [
         'adoption' => 'Adopciones',
-        'lost_pet' => 'Perdidas',
+        'lost_pet' => 'Perdidos',
     ];
 
     private function resolvePetModel(string $petType): string
