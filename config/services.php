@@ -7,9 +7,7 @@ $picturesHost = env('AWS_URL_LOCAL', 'http://localhost:9000')
     . '/';
 
 if ($isProduction) {
-    $picturesHost = env('AWS_URL')
-        . '/' . env('AWS_BUCKET', 'petfinder-pictures')
-        . '/';
+    $picturesHost = env('AWS_URL') . '/';
 }
 
 return [
