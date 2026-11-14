@@ -2,13 +2,34 @@
 
 namespace App\Services\Management;
 
+use App\Helpers\ValidationErrorHelper;
 use App\Models\Management\AccountDeletion;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\ValidatedInput;
 
 class ManagementService
 {
     private const PENDING_STATUS_ID = 1;
     private const IN_PROGRESS_STATUS_ID = 2;
+
+    public function changePassword(Authenticatable $account, ValidatedInput $validated): void
+    {
+        if (!Hash::check($validated['current_password'], $account->password)) {
+            ValidationErrorHelper::throwValidationError([
+                'current_password' => 'La contraseña actual no es correcta',
+            ]);
+        }
+
+        $account->fill(['password' => $validated['new_password']])->save();
+
+        $currentTokenId = $account->currentAccessToken()?->id;
+
+        $account->tokens()
+            ->when($currentTokenId, fn ($query) => $query->where('id', '!=', $currentTokenId))
+            ->delete();
+    }
 
     public function existsAccountDeletion(int $tutorId): bool{
         $pendingDeletion = AccountDeletion::where('tutor_id', $tutorId)

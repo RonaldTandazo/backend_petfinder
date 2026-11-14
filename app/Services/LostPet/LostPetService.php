@@ -3,6 +3,7 @@
 namespace App\Services\LostPet;
 
 use App\Jobs\SyncPictureJob;
+use App\Models\Catalog\ReportStatus;
 use App\Models\LostPet\LostPet;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,9 +22,6 @@ class LostPetService
             ->whereNull('closing_date')
             ->where('report_status_id', 1)
             ->where('report_type_id', 1)
-            ->when(!empty($filters['tutor_id']), function ($q) use ($filters) {
-                $q->where('tutor_id', $filters['tutor_id']);
-            })
             ->when(!empty($filters['search']), function ($q) use ($filters) {
                 $searchTerm = '%' . trim($filters['search']) . '%';
 
@@ -186,6 +184,25 @@ class LostPetService
             $lostPet->pictures()->delete();
 
             $lostPet->delete();
+        });
+    }
+
+    public function changeStatus(int $lostPetId, int $tutorId, ValidatedInput $validated): LostPet
+    {
+        return DB::transaction(function () use ($lostPetId, $tutorId, $validated) {
+            $lostPet = LostPet::where('id', $lostPetId)
+                ->where('tutor_id', $tutorId)
+                ->firstOrFail();
+
+            $status = $validated->only('status');
+
+            $newStatus = ReportStatus::where('tag', $status)->firstOrFail();
+
+            $lostPet->update([
+                'report_status_id' => $newStatus->id
+            ]);
+
+            return $lostPet;
         });
     }
 }

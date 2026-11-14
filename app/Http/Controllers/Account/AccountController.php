@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Account\ChangePasswordRequest;
+use App\Http\Requests\Account\AccountPetsRequest;
 use App\Http\Requests\Account\ProfileRequest;
 use App\Http\Requests\Account\UpdateProfileRequest;
 use App\Http\Resources\Account\ShelterResource;
@@ -12,8 +12,6 @@ use App\Http\Resources\Account\UserResource;
 use App\Http\Resources\Adoption\AdoptionPetListResource;
 use App\Http\Resources\LostPet\LostPetListResource;
 use App\Services\Account\AccountService;
-use App\Services\Adoption\AdoptionService;
-use App\Services\LostPet\LostPetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -21,9 +19,7 @@ use Throwable;
 class AccountController extends Controller
 {
     public function __construct(
-        protected AccountService $accountService,
-        protected AdoptionService $adoptionService,
-        protected LostPetService $lostPetService
+        protected AccountService $accountService
     ) {}
 
     public function getProfile(ProfileRequest $request): JsonResponse
@@ -36,13 +32,9 @@ class AccountController extends Controller
             $page_adoptions = $validated['page_adoptions'] ?? 1;
             $page_lost_pets = $validated['page_lost_pets'] ?? 1;            
 
-            $filters = [
-                'tutor_id' => $tutorId
-            ];
-
             $metrics = $this->accountService->getProfileMetrics($tutorId);
-            $adoptions = $this->adoptionService->getAdoptionPets($filters, $page_adoptions, $limit);
-            $lostPets = $this->lostPetService->getLostPets($filters, $page_lost_pets, $limit);
+            $adoptions = $this->accountService->getAccountAdoptionPets($tutorId, $page_adoptions, $limit);
+            $lostPets = $this->accountService->getAccountLostPets($tutorId, $page_lost_pets, $limit);
 
             $data = [
                 'metrics'          => $metrics,
@@ -126,13 +118,25 @@ class AccountController extends Controller
         }
     }
 
-    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    public function getAccountAdoptionPets(AccountPetsRequest $request): JsonResponse
     {
         try {
-            $this->accountService->changePassword($request->user(), $request->safe());
+            $validated = $request->safe();
+
+            $tutorId = $validated['tutor_id'] ?? $this->getTutorId();
+            $page    = $validated['page'] ?? 1;
+            $limit   = $validated['limit'] ?? 20;
+
+            $result = $this->accountService->getAccountAdoptionPets($tutorId, $page, $limit);
+
+            $data = [
+                'pets'    => AdoptionPetListResource::collection($result['items']),
+                'hasMore' => $result['hasMore'],
+            ];
 
             return $this->sendResponse(
-                message : 'Contraseña actualizada exitosamente'
+                data    : $data,
+                message : 'Listado de mascotas obtenido exitosamente',
             );
         } catch (CustomValidationException $e) {
             return $this->sendError(
@@ -141,11 +145,47 @@ class AccountController extends Controller
                 code    : $e->getCode()
             );
         } catch (Throwable $th) {
-            Log::error('Error actualizando contraseña: ' . $th->getMessage(), ['exception' => $th]);
+            Log::error('Error al obtener lista de mascotas: ' . $th->getMessage(), ['exception' => $th]);
 
             return $this->sendError(
-                message : 'No se pudo actualizar la contraseña',
-                error   : $th->getMessage()
+                message : 'No se pudo obtener el listado de mascotas',
+                error   : $th->getMessage(),
+            );
+        }
+    }
+
+    public function getAccountLostPets(AccountPetsRequest $request): JsonResponse
+    {
+        try {
+            $validated = $request->safe();
+
+            $tutorId = $validated['tutor_id'] ?? $this->getTutorId();
+            $page    = $validated['page'] ?? 1;
+            $limit   = $validated['limit'] ?? 20;
+
+            $result = $this->accountService->getAccountLostPets($tutorId, $page, $limit);
+
+            $data = [
+                'pets'    => LostPetListResource::collection($result['items']),
+                'hasMore' => $result['hasMore'],
+            ];
+
+            return $this->sendResponse(
+                data    : $data,
+                message : 'Mascotas perdidas obtenido exitosamente',
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
+            );
+        } catch (Throwable $th) {
+            Log::error('Error al obtener las mascotas perdidas: ' . $th->getMessage(), ['exception' => $th]);
+
+            return $this->sendError(
+                message : 'No se pudo obtener las mascotas perdidas',
+                error   : $th->getMessage(),
             );
         }
     }

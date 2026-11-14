@@ -2,7 +2,6 @@
 
 namespace App\Services\Account;
 
-use App\Helpers\ValidationErrorHelper;
 use App\Models\Adoption\Adoption;
 use App\Models\LostPet\LostPet;
 use App\Models\Pet\Pet;
@@ -11,7 +10,6 @@ use App\Services\Storage\PictureDeletionService;
 use App\Services\Storage\PictureSyncService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ValidatedInput;
 
 class AccountService
@@ -124,20 +122,41 @@ class AccountService
         });
     }
 
-    public function changePassword(Authenticatable $account, ValidatedInput $validated): void
+    public function getAccountAdoptionPets(int $tutorId, int $page, int $limit): array
     {
-        if (!Hash::check($validated['current_password'], $account->password)) {
-            ValidationErrorHelper::throwValidationError([
-                'current_password' => 'La contraseña actual no es correcta',
-            ]);
-        }
+        $skip = ($page - 1) * $limit;
 
-        $account->fill(['password' => $validated['new_password']])->save();
+        $pets = Pet::with(['species', 'animalGender', 'size', 'healthConditions', 'petStatus'])
+            ->where('tutor_id', $tutorId)
+            ->orderByDesc('created_at')
+            ->skip($skip)
+            ->take($limit + 1)
+            ->get();
 
-        $currentTokenId = $account->currentAccessToken()?->id;
+        $hasMore = $pets->count() > $limit;
 
-        $account->tokens()
-            ->when($currentTokenId, fn ($query) => $query->where('id', '!=', $currentTokenId))
-            ->delete();
+        return [
+            'items'   => $pets->take($limit),
+            'hasMore' => $hasMore,
+        ];
+    }
+
+    public function getAccountLostPets(int $tutorId, int $page, int $limit): array
+    {
+        $skip = ($page - 1) * $limit;
+
+        $lostPets = LostPet::with(['species', 'animalGender', 'reportStatus'])
+            ->where('tutor_id', $tutorId)
+            ->orderByDesc('event_date')
+            ->skip($skip)
+            ->take($limit + 1)
+            ->get();
+
+        $hasMore = $lostPets->count() > $limit;
+
+        return [
+            'items'   => $lostPets->take($limit),
+            'hasMore' => $hasMore,
+        ];
     }
 }

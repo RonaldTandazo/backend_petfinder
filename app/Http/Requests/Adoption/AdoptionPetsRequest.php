@@ -25,7 +25,6 @@ class AdoptionPetsRequest extends FormRequest
             'health_conditions.*' => ['integer', 'exists:health_conditions,id'],
             'page'                => ['nullable', 'integer', 'min:1'],
             'limit'               => ['nullable', 'integer', 'min:1', 'max:50'],
-            'tutor_id'            => ['nullable', 'integer', 'exists:tutors,id'],
         ];
     }
 
@@ -49,8 +48,7 @@ class AdoptionPetsRequest extends FormRequest
             'page.min'                    => 'La página debe ser al menos 1',
             'limit.integer'               => 'El límite debe ser un valor entero',
             'limit.min'                   => 'El límite mínimo permitido es 1',
-            'limit.max'                   => 'El límite máximo permitido es 50',
-            'tutor_id.exists'             => 'El tutor especificado no existe'
+            'limit.max'                   => 'El límite máximo permitido es 50'
         ];
     }
 }

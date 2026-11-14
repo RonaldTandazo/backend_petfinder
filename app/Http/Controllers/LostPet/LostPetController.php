@@ -4,6 +4,7 @@ namespace App\Http\Controllers\LostPet;
 
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LostPet\ChangeStatusRequest;
 use App\Http\Requests\LostPet\FormLostPetRequest;
 use App\Http\Requests\LostPet\LostPetsReportsRequest;
 use App\Http\Resources\LostPet\LostPetListResource;
@@ -182,6 +183,37 @@ class LostPetController extends Controller
 
             return $this->sendError(
                 message : 'No se pudo eliminar reporte de mascota perdida',
+                error   : $th->getMessage()
+            );
+        }
+    }
+
+    public function changeStatus(ChangeStatusRequest $request, int $lostPetId): JsonResponse
+    {
+        try {
+            $tutorId = $this->getTutorId();
+
+            $this->lostPetService->changeStatus($lostPetId, $tutorId, $request->safe());
+
+            return $this->sendResponse(
+                message: 'Estado de Mascota Perdida actualizado'
+            );
+        } catch (ModelNotFoundException $e) {
+            return $this->sendError(
+                message : 'Mascota Perdida no encontrada',
+                code    : Response::HTTP_NOT_FOUND
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
+            );
+        } catch (Throwable $th) {
+            Log::error('Error cambiando el estado de mascota perdida: ' . $th->getMessage(), ['exception' => $th]);
+
+            return $this->sendError(
+                message : 'No se pudo cambiar el estado de mascota perdida',
                 error   : $th->getMessage()
             );
         }

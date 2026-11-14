@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Adoption;
 use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Adoption\AdoptionPetsRequest;
+use App\Http\Requests\Adoption\ChangeStatusRequest;
 use App\Http\Requests\Adoption\FormAdoptionPetRequest;
 use App\Http\Resources\Adoption\AdoptionPetListResource;
 use App\Http\Resources\Adoption\AdoptionPetResource;
@@ -177,6 +178,37 @@ class AdoptionController extends Controller
 
             return $this->sendError(
                 message : 'No se pudo eliminar mascota',
+                error   : $th->getMessage()
+            );
+        }
+    }
+
+    public function changeStatus(ChangeStatusRequest $request, int $petId): JsonResponse
+    {
+        try {
+            $tutorId = $this->getTutorId();
+
+            $this->adoptionService->changeStatus($petId, $tutorId, $request->safe());
+
+            return $this->sendResponse(
+                message: 'Estado de Mascota actualizado'
+            );
+        } catch (ModelNotFoundException $e) {
+            return $this->sendError(
+                message : 'Mascota no encontrada',
+                code    : Response::HTTP_NOT_FOUND
+            );
+        } catch (CustomValidationException $e) {
+            return $this->sendError(
+                message : $e->getMessage(),
+                error   : $e->errors(),
+                code    : $e->getCode()
+            );
+        } catch (Throwable $th) {
+            Log::error('Error cambiando el estado de mascota: ' . $th->getMessage(), ['exception' => $th]);
+
+            return $this->sendError(
+                message : 'No se pudo cambiar el estado de mascota',
                 error   : $th->getMessage()
             );
         }

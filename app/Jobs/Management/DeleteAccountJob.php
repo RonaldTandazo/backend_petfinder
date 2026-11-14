@@ -5,7 +5,10 @@ namespace App\Jobs\Management;
 use App\Models\Account\Shelter;
 use App\Models\Account\Tutor;
 use App\Models\Account\User;
+use App\Models\Follow\PetFollows;
+use App\Models\LostPet\LostPet;
 use App\Models\Management\AccountDeletion;
+use App\Models\Pet\Pet;
 use App\Models\Picture\Picture;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -107,6 +110,14 @@ class DeleteAccountJob implements ShouldQueue
 
             $shelterId = $tutor->shelter_id;
             $userId = $tutor->user_id;
+
+            PetFollows::where('pet_type', Pet::class)
+                ->whereIn('pet_id', $tutor->pets()->select('id'))
+                ->delete();
+
+            PetFollows::where('pet_type', LostPet::class)
+                ->whereIn('pet_id', $tutor->lostPets()->select('id'))
+                ->delete();
 
             $tutor->delete();
 

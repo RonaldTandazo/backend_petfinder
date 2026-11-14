@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Requests\Account;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class AccountPetsRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user() && $this->user()->tutor !== null;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'page'                => ['nullable', 'integer', 'min:1'],
+            'limit'               => ['nullable', 'integer', 'min:1', 'max:50'],
+            'tutor_id'            => ['nullable', 'integer', 'exists:tutors,id'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'page.integer'                => 'El número de página debe ser un valor entero',
+            'page.min'                    => 'La página debe ser al menos 1',
+            'limit.integer'               => 'El límite debe ser un valor entero',
+            'limit.min'                   => 'El límite mínimo permitido es 1',
+            'limit.max'                   => 'El límite máximo permitido es 50',
+            'tutor_id.exists'             => 'El tutor especificado no existe'
+        ];
+    }
+}

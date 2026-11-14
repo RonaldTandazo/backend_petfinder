@@ -3,6 +3,7 @@
 namespace App\Services\Adoption;
 
 use App\Jobs\SyncPictureJob;
+use App\Models\Catalog\PetStatus;
 use App\Models\Pet\Pet;
 use App\Services\Storage\PictureDeletionService;
 use Illuminate\Database\Eloquent\Collection;
@@ -17,11 +18,8 @@ class AdoptionService
     {
         $skip = ($page - 1) * $limit;
 
-        $pets = Pet::with(['species', 'animalGender', 'size', 'healthConditions'])
+        $pets = Pet::with(['species', 'animalGender', 'size', 'healthConditions', 'petStatus'])
             ->where('pet_status_id', 1)
-            ->when(!empty($filters['tutor_id']), function ($q) use ($filters) {
-                $q->where('tutor_id', $filters['tutor_id']);
-            })
             ->when(!empty($filters['search']), function ($q) use ($filters) {
                 $searchTerm = '%' . trim($filters['search']) . '%';
 
@@ -199,6 +197,25 @@ class AdoptionService
             $pet->pictures()->delete();
 
             $pet->delete();
+        });
+    }
+
+    public function changeStatus(int $petId, int $tutorId, ValidatedInput $validated): Pet
+    {
+        return DB::transaction(function () use ($petId, $tutorId, $validated) {
+            $pet = Pet::where('id', $petId)
+                ->where('tutor_id', $tutorId)
+                ->firstOrFail();
+
+            $status = $validated->only('status');
+
+            $newStatus = PetStatus::where('tag', $status)->firstOrFail();
+
+            $pet->update([
+                'pet_status_id' => $newStatus->id
+            ]);
+
+            return $pet;
         });
     }
 }

@@ -21,6 +21,8 @@ class AdoptionPetListResource extends JsonResource
             'city'       => $this->city,
             'latitude'   => $this->latitude,
             'longitude'  => $this->longitude,
+            'status'     => $this->whenLoaded('petStatus', fn () => $this->petStatus->name),
+            'status_tag' => $this->whenLoaded('petStatus', fn () => $this->petStatus->tag),
             'is_urgent'  => $this->is_urgent,
             'picture'    => $this->mainPicture ? config('services.pictures.host') . $this->mainPicture->path : null
         ];
