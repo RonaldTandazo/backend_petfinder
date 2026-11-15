@@ -5,7 +5,6 @@ namespace App\Jobs\Management;
 use App\Models\Account\Shelter;
 use App\Models\Account\Tutor;
 use App\Models\Account\User;
-use App\Models\Follow\PetFollows;
 use App\Models\LostPet\LostPet;
 use App\Models\Management\AccountDeletion;
 use App\Models\Pet\Pet;
