@@ -111,14 +111,6 @@ class DeleteAccountJob implements ShouldQueue
             $shelterId = $tutor->shelter_id;
             $userId = $tutor->user_id;
 
-            PetFollows::where('pet_type', Pet::class)
-                ->whereIn('pet_id', $tutor->pets()->select('id'))
-                ->delete();
-
-            PetFollows::where('pet_type', LostPet::class)
-                ->whereIn('pet_id', $tutor->lostPets()->select('id'))
-                ->delete();
-
             $tutor->delete();
 
             if ($shelterId) {

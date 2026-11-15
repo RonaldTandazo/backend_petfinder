@@ -196,6 +196,8 @@ class AdoptionService
             $pet->pictures->each(fn ($picture) => $this->pictureDeletionService->delete($picture));
             $pet->pictures()->delete();
 
+            $pet->follows()->delete();
+
             $pet->delete();
         });
     }

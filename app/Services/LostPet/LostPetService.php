@@ -183,6 +183,8 @@ class LostPetService
             $lostPet->pictures->each(fn ($picture) => $this->pictureDeletionService->delete($picture));
             $lostPet->pictures()->delete();
 
+            $lostPet->follows()->delete();
+
             $lostPet->delete();
         });
     }
